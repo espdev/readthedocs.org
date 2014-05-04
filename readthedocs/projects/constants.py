@@ -74,6 +74,7 @@ REPO_CHOICES = (
     ('svn', _('Subversion')),
     ('hg', _('Mercurial')),
     ('bzr', _('Bazaar')),
+    ('p4', _('Perforce')),
 )
 
 PUBLIC = 'public'
