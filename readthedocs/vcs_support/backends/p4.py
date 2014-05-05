@@ -6,7 +6,7 @@ Module provides a backend for Perforce VCS
 You should use this backend for build projects from Perforce VCS.
 
 .. warning::
-    First you must create perforce config (see Perforce documentation)::
+    Firstly you must create Perforce config (see Perforce documentation)::
 
         - P4USER
         - P4PASSWD
