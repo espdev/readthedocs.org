@@ -1,21 +1,36 @@
 #coding=utf-8
 
+"""
+Module provides a backend for Perforce VCS
+
+"""
+
 from projects.exceptions import ProjectImportError
 from vcs_support.base import BaseVCS, VCSVersion
 
 try:
     from P4 import P4, P4Exception
 except ImportError:
+    # FIXME: Use p4 client directly?
+
     raise ProjectImportError((
         'Cannot import P4Python. You must install Perforce Python API.\n'
         + 'See: http://www.perforce.com/perforce/doc.current/manuals/p4script/03_python.html'
     ))
 
+# import re
 
-CLIENT_TEMPLATE = 'espdev-rtd-srv-main'   # tmp
+# For parsion of version like "v1.0.0"
+# tag_version_pat = re.compile('v([0-9]+\.)+[0-9]+[a-zA-Z]*$')
+
+# You must be create this client for your perforce environment
+BACKEND_CLIENT = 'readthedocs-perforce-backend'
 
 
 class Backend(BaseVCS):
+    """Class is a backend for Perforce VCS
+    """
+
     supports_tags = True
     supports_branches = False
     fallback_branch = ''
@@ -23,12 +38,7 @@ class Backend(BaseVCS):
     def __init__(self, project, version):
         super(Backend, self).__init__(project, version)
 
-        print 'I am PERFORCE BACKEND'
-
-        print 'PROJECT NAME: {}'.format(self.name)
-        print 'PROJECT WORKING DIR: {}'.format(self.working_dir)
-
-        p4 = P4()   # P4 API
+        p4 = P4()   # P4 Python API
 
         try:
             if not p4.connected():
@@ -40,8 +50,6 @@ class Backend(BaseVCS):
         self.p4 = p4
 
     def __del__(self):
-        print 'DISCONNECT PERFORCE BACKEND'
-
         try:
             self.p4.disconnect()
         except P4Exception as err:
@@ -50,10 +58,8 @@ class Backend(BaseVCS):
     def update(self):
         super(Backend, self).update()
 
-        print 'PERFORCE UPDATE'
-
         self._update_client()
-        self.sync()
+        self.co()
 
     @property
     def tags(self):
@@ -67,11 +73,72 @@ class Backend(BaseVCS):
         vcs_tags = []
 
         for label in labels:
-            vcs_tags.append(VCSVersion(self, label['label'], label['label']))
+            label_name = label['label']
+            verbose_name = label_name
+
+            # FIXME: It's needed?
+            # Parse version
+            # match = tag_version_pat.search(label_name)
+            # if match:
+            #     verbose_name = label_name[match.start():match.end()]
+
+            vcs_tags.append(VCSVersion(self, label_name, verbose_name))
 
         return vcs_tags
 
-    def sync(self, identifier=None):
+    def co(self, identifier=None):
+        self._revert()
+        info = self._sync(identifier)
+        self._edit()
+
+        return info
+
+    def checkout(self, identifier=None):
+        super(Backend, self).checkout()
+
+        try:
+            self._update_client()
+            info = self.co(identifier)
+        except ProjectImportError as err:
+            retcode = 1
+            stdout = 'Files have not been synchronized'
+            stderr = '{}'.format(err)
+        else:
+            retcode = 0
+            stdout = '{} files have been synchronized'.format(len(info))
+            stderr = 'All is well. No errors'
+
+        return retcode, stdout, stderr
+
+    def _update_client(self):
+        try:
+            # Change client and change root for current project
+            self.p4.client = BACKEND_CLIENT
+
+            client = self.p4.fetch_client('-t', BACKEND_CLIENT)
+            client['Root'] = self.working_dir
+
+            self.p4.save_client(client)
+        except P4Exception as err:
+            raise ProjectImportError(
+                'Failed to update client "{}".\n{}\n'.format(
+                    BACKEND_CLIENT, err))
+
+    def _get_depot_url(self):
+        depot_url = self.repo_url.rstrip('/')
+
+        if not depot_url.endswith('/...'):
+            # A canonical depot url for view to all files
+            depot_url += '/...'
+        return depot_url
+
+    def _revert(self):
+        try:
+            self.p4.run_revert(self._get_depot_url())
+        except P4Exception as err:
+            print err
+
+    def _sync(self, identifier):
         depot_url = self._get_depot_url()
 
         if identifier:
@@ -79,54 +146,19 @@ class Backend(BaseVCS):
             depot_url += '@{}'.format(identifier)
 
         try:
-            self.p4.run_revert(self._get_depot_url())
-        except P4Exception as err:
-            print err
-
-        try:
             info = self.p4.run_sync('-f', depot_url)
         except P4Exception as err:
             raise ProjectImportError(
-                "Failed to get code from '{}'. Error:\n{}\n".format(
+                "Failed to sync code from '{}'. Error:\n{}\n".format(
                     self.repo_url, err)
             )
+        return info
 
+    def _edit(self):
         try:
             self.p4.run_edit(self._get_depot_url())
         except P4Exception as err:
             raise ProjectImportError(
-                "Failed to edit code from '{}'. Error:\n{}\n".format(
+                "Failed to open for edit code from '{}'. Error:\n{}\n".format(
                     self.repo_url, err)
             )
-
-        return info
-
-    def checkout(self, identifier=None):
-        super(Backend, self).checkout()
-
-        print 'PERFORCE CHECKOUT'
-
-        self._update_client()
-        info = self.sync(identifier)
-
-        return 0, '{}'.format(info), ''
-
-    def _update_client(self):
-        try:
-            self.p4.client = CLIENT_TEMPLATE
-
-            client = self.p4.fetch_client('-t', CLIENT_TEMPLATE)
-            client['Root'] = self.working_dir
-            self.p4.save_client(client)
-
-        except P4Exception as err:
-            raise ProjectImportError(
-                'Failed to create project client.\n{}\n'.format(err))
-
-    def _get_depot_url(self):
-        depot_url = self.repo_url.rstrip('/')
-
-        if not depot_url.endswith('/...'):
-            depot_url += '/...'
-
-        return depot_url
