@@ -3,6 +3,34 @@
 """
 Module provides a backend for Perforce VCS
 
+You should use this backend for build projects from Perforce VCS.
+
+.. warning::
+    First you must create perforce config (see Perforce documentation)::
+
+        - P4USER
+        - P4PASSWD
+        - P4PORT
+        - P4CLIENT=readthedocs-perforce-backend
+
+This backend use client (workspace) ``readthedocs-perforce-backend``. This
+client must be created for your Perforce environment (user/server).
+
+You should set ``Repo`` in the project settings as::
+
+    //<depot_name>/<...>/<project_name>
+
+Where::
+
+    <depot_name> -- name of Perforce depot
+    <...> -- path to project dir in depot
+    <project_name> -- name of your project dir
+
+.. note::
+
+    * This backend supports versions as perforce labels.
+    * This backend uses P4Python API. It must be installed.
+
 """
 
 from projects.exceptions import ProjectImportError
@@ -23,7 +51,7 @@ except ImportError:
 # For parsion of version like "v1.0.0"
 # tag_version_pat = re.compile('v([0-9]+\.)+[0-9]+[a-zA-Z]*$')
 
-# You must be create this client for your perforce environment
+# You must create this client for your perforce environment
 BACKEND_CLIENT = 'readthedocs-perforce-backend'
 
 
