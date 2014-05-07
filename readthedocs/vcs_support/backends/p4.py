@@ -46,12 +46,7 @@ except ImportError:
         + 'See: http://www.perforce.com/perforce/doc.current/manuals/p4script/03_python.html'
     ))
 
-# import re
-
-# For parsion of version like "v1.0.0"
-# tag_version_pat = re.compile('v([0-9]+\.)+[0-9]+[a-zA-Z]*$')
-
-# You must create this client for your perforce environment
+# You must create this client manually for your perforce environment
 BACKEND_CLIENT = 'readthedocs-perforce-backend'
 
 
@@ -102,15 +97,7 @@ class Backend(BaseVCS):
 
         for label in labels:
             label_name = label['label']
-            verbose_name = label_name
-
-            # FIXME: It's needed?
-            # Parse version
-            # match = tag_version_pat.search(label_name)
-            # if match:
-            #     verbose_name = label_name[match.start():match.end()]
-
-            vcs_tags.append(VCSVersion(self, label_name, verbose_name))
+            vcs_tags.append(VCSVersion(self, label_name, label_name))
 
         return vcs_tags
 
