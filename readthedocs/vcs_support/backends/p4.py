@@ -111,17 +111,17 @@ class Backend(BaseVCS):
     def checkout(self, identifier=None):
         super(Backend, self).checkout()
 
+        retcode = 0
+        stderr = ''
+
         try:
             self._update_client()
             info = self.co(identifier)
+            stdout = '{} files have been synchronized'.format(len(info))
         except ProjectImportError as err:
             retcode = 1
             stdout = 'Files have not been synchronized'
             stderr = '{}'.format(err)
-        else:
-            retcode = 0
-            stdout = '{} files have been synchronized'.format(len(info))
-            stderr = 'All is well. No errors'
 
         return retcode, stdout, stderr
 
