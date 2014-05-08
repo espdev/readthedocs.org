@@ -33,6 +33,8 @@ Where::
 
 """
 
+import os
+
 from projects.exceptions import ProjectImportError
 from vcs_support.base import BaseVCS, VCSVersion
 
@@ -104,7 +106,6 @@ class Backend(BaseVCS):
     def co(self, identifier=None):
         self._revert()
         info = self._sync(identifier)
-        self._edit()
 
         return info
 
@@ -167,13 +168,10 @@ class Backend(BaseVCS):
                 "Failed to sync code from '{}'. Error:\n{}\n".format(
                     self.repo_url, err)
             )
-        return info
 
-    def _edit(self):
-        try:
-            self.p4.run_edit(self._get_depot_url())
-        except P4Exception as err:
-            raise ProjectImportError(
-                "Failed to open for edit code from '{}'. Error:\n{}\n".format(
-                    self.repo_url, err)
-            )
+        for rootdir, dirnames, filenames in os.walk(self.working_dir):
+            for fname in filenames:
+                pname = os.path.join(rootdir, fname)
+                os.chmod(pname, 0o777)
+
+        return info
