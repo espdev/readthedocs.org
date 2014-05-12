@@ -3,7 +3,7 @@ import os
 import sys
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.sqlite")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.postgres_local")
     sys.path.append('readthedocs')
 
     from django.core.management import execute_from_command_line
