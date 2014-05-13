@@ -13,8 +13,8 @@ DATABASES = {
     }
 }
 
-DEBUG = False
-TEMPLATE_DEBUG = False
+# DEBUG = False
+# TEMPLATE_DEBUG = False
 
 REDIS = {
     'host': 'localhost',
