@@ -26,17 +26,21 @@ REDIS = {
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'localhost:6379',
-        'PREFIX': 'docs',
-        'OPTIONS': {
-            'DB': 1,
-            'PARSER_CLASS': 'redis.connection.HiredisParser'
-        },
-    },
-}
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_HTTPONLY = False
+CACHE_BACKEND = 'dummy://'
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'redis_cache.RedisCache',
+#         'LOCATION': 'localhost:6379',
+#         'PREFIX': 'docs',
+#         'OPTIONS': {
+#             'DB': 1,
+#             'PARSER_CLASS': 'redis.connection.HiredisParser'
+#         },
+#     },
+# }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
@@ -48,6 +52,12 @@ DONT_HIT_DB = False
 PRODUCTION_DOMAIN = 'localhost'
 USE_SUBDOMAIN = True
 NGINX_X_ACCEL_REDIRECT = True
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+    },
+}
 
 # MEDIA_URL = 'https://media.readthedocs.org/'
 # STATIC_URL = 'https://media.readthedocs.org/static/'
