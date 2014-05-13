@@ -15,7 +15,6 @@ DATABASES = {
 
 DEBUG = False
 TEMPLATE_DEBUG = False
-CELERY_ALWAYS_EAGER = False
 
 REDIS = {
     'host': 'localhost',
@@ -30,28 +29,10 @@ SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_HTTPONLY = False
 CACHE_BACKEND = 'dummy://'
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'redis_cache.RedisCache',
-#         'LOCATION': 'localhost:6379',
-#         'PREFIX': 'docs',
-#         'OPTIONS': {
-#             'DB': 1,
-#             'PARSER_CLASS': 'redis.connection.HiredisParser'
-#         },
-#     },
-# }
-
-SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 SLUMBER_API_HOST = 'http://localhost:8000'
-WEBSOCKET_HOST = 'localhost:8088'
+PRODUCTION_DOMAIN = 'localhost:8000'
 
-IMPORT_EXTERNAL_DATA = False
-DONT_HIT_DB = False
-PRODUCTION_DOMAIN = 'localhost'
-USE_SUBDOMAIN = False
-NGINX_X_ACCEL_REDIRECT = True
+WEBSOCKET_HOST = 'localhost:8088'
 
 HAYSTACK_CONNECTIONS = {
     'default': {
@@ -59,24 +40,19 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
-# MEDIA_URL = 'https://media.readthedocs.org/'
-# STATIC_URL = 'https://media.readthedocs.org/static/'
-# ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
+IMPORT_EXTERNAL_DATA = False
+DONT_HIT_DB = False
+NGINX_X_ACCEL_REDIRECT = True
 
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-#         'URL': 'http://odin:8983/solr',
-#     }
-# }
+CELERY_ALWAYS_EAGER = True
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Elasticsearch settings.
-# ES_HOSTS = ['backup:9200', 'db:9200']
-# ES_DEFAULT_NUM_REPLICAS = 1
-# ES_DEFAULT_NUM_SHARDS = 5
-
-# Lock builds for 10 minutes
-# REPO_LOCK_SECONDS = 300
+# For testing locally. Put this in your /etc/hosts:
+# 127.0.0.1 test
+# and navigate to http://test:8000
+CORS_ORIGIN_WHITELIST = (
+    'test:8000',
+)
 
 try:
     from local_settings import *  # noqa
