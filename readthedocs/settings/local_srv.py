@@ -39,15 +39,8 @@ CACHES = {
 }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
-
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
-SESSION_COOKIE_DOMAIN = 'localhost'
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_DOMAIN = 'localhost'
-CSRF_COOKIE_SECURE = False
-
 SLUMBER_API_HOST = 'http://localhost:8000'
-
 WEBSOCKET_HOST = 'localhost:8088'
 
 IMPORT_EXTERNAL_DATA = False
