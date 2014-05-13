@@ -27,7 +27,7 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_HTTPONLY = False
-CACHE_BACKEND = 'dummy://'
+# CACHE_BACKEND = 'dummy://'
 
 SLUMBER_API_HOST = 'http://localhost:8000'
 PRODUCTION_DOMAIN = 'localhost:8000'
@@ -37,6 +37,18 @@ WEBSOCKET_HOST = 'localhost:8088'
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+    },
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': 'localhost:6379',
+        'PREFIX': 'docs',
+        'OPTIONS': {
+            'DB': 1,
+            'PARSER_CLASS': 'redis.connection.HiredisParser'
+        },
     },
 }
 
