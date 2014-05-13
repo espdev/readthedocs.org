@@ -13,6 +13,10 @@ DATABASES = {
     }
 }
 
+DEBUG = False
+TEMPLATE_DEBUG = False
+CELERY_ALWAYS_EAGER = False
+
 REDIS = {
     'host': 'localhost',
     'port': 6379,
@@ -30,7 +34,7 @@ CACHES = {
         'PREFIX': 'docs',
         'OPTIONS': {
             'DB': 1,
-            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'PARSER_CLASS': 'redis.connection.HiredisParser'
         },
     },
 }
@@ -43,10 +47,6 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_DOMAIN = 'localhost'
 CSRF_COOKIE_SECURE = False
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-SLUMBER_USERNAME = 'test'
-SLUMBER_PASSWORD = 'test'
 SLUMBER_API_HOST = 'http://localhost:8000'
 
 WEBSOCKET_HOST = 'localhost:8088'
@@ -54,4 +54,29 @@ WEBSOCKET_HOST = 'localhost:8088'
 IMPORT_EXTERNAL_DATA = False
 DONT_HIT_DB = False
 PRODUCTION_DOMAIN = 'localhost'
-USE_SUBDOMAIN = False
+USE_SUBDOMAIN = True
+NGINX_X_ACCEL_REDIRECT = True
+
+# MEDIA_URL = 'https://media.readthedocs.org/'
+# STATIC_URL = 'https://media.readthedocs.org/static/'
+# ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
+
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+#         'URL': 'http://odin:8983/solr',
+#     }
+# }
+
+# Elasticsearch settings.
+# ES_HOSTS = ['backup:9200', 'db:9200']
+# ES_DEFAULT_NUM_REPLICAS = 1
+# ES_DEFAULT_NUM_SHARDS = 5
+
+# Lock builds for 10 minutes
+REPO_LOCK_SECONDS = 300
+
+try:
+    from local_settings import *  # noqa
+except ImportError:
+    pass
