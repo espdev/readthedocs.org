@@ -50,7 +50,7 @@ WEBSOCKET_HOST = 'localhost:8088'
 IMPORT_EXTERNAL_DATA = False
 DONT_HIT_DB = False
 PRODUCTION_DOMAIN = 'localhost'
-USE_SUBDOMAIN = True
+USE_SUBDOMAIN = False
 NGINX_X_ACCEL_REDIRECT = True
 
 HAYSTACK_CONNECTIONS = {
@@ -76,7 +76,7 @@ HAYSTACK_CONNECTIONS = {
 # ES_DEFAULT_NUM_SHARDS = 5
 
 # Lock builds for 10 minutes
-REPO_LOCK_SECONDS = 300
+# REPO_LOCK_SECONDS = 300
 
 try:
     from local_settings import *  # noqa
