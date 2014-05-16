@@ -5,9 +5,9 @@ from .base import *  # noqa
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'docs',
-        'USER': 'docs',
-        'PASSWORD': 'docs',
+        'NAME': 'rtd',
+        'USER': 'rtd',
+        'PASSWORD': '',
         'HOST': '',
         'PORT': '',
     }
