@@ -5,39 +5,28 @@ from .base import *  # noqa
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'docs',
-        'USER': 'docs',
-        'PASSWORD': 'docs',
+        'NAME': 'rtd',
+        'USER': 'rtd',
+        'PASSWORD': 'rtd',
         'HOST': '',
         'PORT': '',
     }
 }
 
-# DEBUG = False
-# TEMPLATE_DEBUG = False
+DEBUG = False
+TEMPLATE_DEBUG = False
+CELERY_ALWAYS_EAGER = False
 
-REDIS = {
-    'host': 'localhost',
-    'port': 6379,
-    'db': 0,
-}
-
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-SESSION_COOKIE_DOMAIN = None
-SESSION_COOKIE_HTTPONLY = False
-# CACHE_BACKEND = 'dummy://'
-
-SLUMBER_API_HOST = 'http://localhost:8000'
-PRODUCTION_DOMAIN = 'localhost:8000'
-
-WEBSOCKET_HOST = 'localhost:8088'
+MEDIA_URL = 'http://media.docs-srv/'
+STATIC_URL = 'http://media.docs-srv/static/'
+ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
-    },
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://localhost:8983/solr',
+    }
 }
 
 CACHES = {
@@ -52,19 +41,22 @@ CACHES = {
     },
 }
 
-IMPORT_EXTERNAL_DATA = False
-DONT_HIT_DB = False
+# Elasticsearch settings.
+ES_HOSTS = ['localhost:9200']
+ES_DEFAULT_NUM_REPLICAS = 1
+ES_DEFAULT_NUM_SHARDS = 5
+
+SLUMBER_API_HOST = 'http://docs-srv'
+WEBSOCKET_HOST = 'websocket.docs-srv:8088'
+
+PRODUCTION_DOMAIN = 'docs-srv'
+USE_SUBDOMAIN = True
 NGINX_X_ACCEL_REDIRECT = True
 
-CELERY_ALWAYS_EAGER = True
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 
-# For testing locally. Put this in your /etc/hosts:
-# 127.0.0.1 test
-# and navigate to http://test:8000
-CORS_ORIGIN_WHITELIST = (
-    'test:8000',
-)
+# Lock builds for 10 minutes
+REPO_LOCK_SECONDS = 300
 
 try:
     from local_settings import *  # noqa
