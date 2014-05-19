@@ -12,7 +12,7 @@ upstream rtd_app {
 
 # Media
 server {
-    listen 8000;
+    listen 80;
     server_name media.readthedocs.org;
     access_log /var/log/nginx/rtdmedia.log;
 
@@ -39,7 +39,7 @@ server {
 # ReadTheDocs
 server {
     index index.html;
-    listen 8000;
+    listen 80;
     server_name docs-srv;
     access_log  /var/log/nginx/readthedocs.log host;
     client_max_body_size 50m;
@@ -100,7 +100,7 @@ server {
 # Subdomains
 server {
     index index.html;
-    listen 8000;
+    listen 80;
     server_name ~^(?P<domain>.+).docs-srv;
     access_log  /var/log/nginx/readthedocs.log host;
 
@@ -175,7 +175,7 @@ server {
 # CNAMEs
 server {
     index index.html;
-    listen 8000 default;
+    listen 80 default;
     access_log /var/log/nginx/readthedocs-cname.log host;
 
     location /favicon.ico {
