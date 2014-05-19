@@ -17,9 +17,10 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 CELERY_ALWAYS_EAGER = False
 
-MEDIA_URL = 'media.docs-srv/'
-STATIC_URL = 'media.docs-srv/static/'
-ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
+# MEDIA_URL = 'media.docs-srv/'
+# STATIC_URL = 'media.docs-srv/static/'
+# ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
+
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 REDIS = {
@@ -60,7 +61,7 @@ SLUMBER_API_HOST = 'http://docs-srv'
 WEBSOCKET_HOST = 'websocket.docs-srv:8088'
 
 PRODUCTION_DOMAIN = 'docs-srv'
-USE_SUBDOMAIN = True
+USE_SUBDOMAIN = False
 NGINX_X_ACCEL_REDIRECT = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
