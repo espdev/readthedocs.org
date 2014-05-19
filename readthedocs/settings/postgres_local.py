@@ -32,8 +32,8 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 SLUMBER_USERNAME = 'test'
 SLUMBER_PASSWORD = 'test'
-SLUMBER_API_HOST = 'http://localhost:8000'
-PRODUCTION_DOMAIN = 'localhost:8000'
+SLUMBER_API_HOST = 'http://docs-srv:8000'
+PRODUCTION_DOMAIN = 'docs-srv'
 
 WEBSOCKET_HOST = 'localhost:8088'
 
