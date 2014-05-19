@@ -10,7 +10,7 @@ TEMPLATE_DEBUG = DEBUG
 TASTYPIE_FULL_DEBUG = True
 LOG_DEBUG = False
 
-PRODUCTION_DOMAIN = 'readthedocs.org'
+PRODUCTION_DOMAIN = 'docs-srv'
 USE_SUBDOMAIN = False
 
 ADMINS = (
@@ -65,6 +65,7 @@ LANGUAGES = (
     ('ja', gettext('Japanese')),
     ('uk', gettext('Ukrainian')),
 )
+
 LOCALE_PATHS = [
     os.path.join(SITE_ROOT, 'readthedocs', 'locale'),
 ]
@@ -184,8 +185,8 @@ CELERY_ROUTES = {
 }
 
 
-DEFAULT_FROM_EMAIL = "no-reply@readthedocs.org"
-SESSION_COOKIE_DOMAIN = 'readthedocs.org'
+DEFAULT_FROM_EMAIL = "no-reply@docs-srv"
+SESSION_COOKIE_DOMAIN = 'docs-srv'
 
 HAYSTACK_CONNECTIONS = {
     'default': {
@@ -211,6 +212,7 @@ IMPORT_EXTERNAL_DATA = True
 
 backup_count = 1000
 maxBytes = 500 * 100 * 100
+
 if LOG_DEBUG:
     backup_count = 2
     maxBytes = 500 * 100 * 10
