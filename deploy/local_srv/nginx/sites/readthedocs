@@ -1,149 +1,247 @@
-perl_modules perl;
-perl_require ReadTheDocs.pm;
+# perl_modules perl;
+# perl_require ReadTheDocs.pm;
+port_in_redirect off;
 
+upstream rtd_app {
+    # fail_timeout=0 means we always retry an upstream even if it failed
+    # to return a good HTTP response (in case the Unicorn master nukes a
+    # single worker for timing out).
+
+    server unix:/home/rtd/run/gunicorn.sock fail_timeout=0;
+}
+
+# Media
 server {
     listen 8000;
     server_name media.readthedocs.org;
-    access_log  /var/log/nginx/rtdmedia.log;
+    access_log /var/log/nginx/rtdmedia.log;
+
+    gzip on;
+    gzip_vary on;
+
+    location /wheelhouse/ {
+        expires 60d;
+        root /home/rtd/site/readthedocs.org/media;
+        add_header X-Deity %(host)s;
+        autoindex on;
+        autoindex_exact_size off;
+        autoindex_localtime on;
+    }
 
     location / {
-        expires 60m;
-        root /home/rtd/venvs/rtd/site/readthedocs.org/media;
+        expires 7d;
+        root /home/rtd/site/readthedocs.org/media;
         add_header X-Deity %(host)s;
+        add_header 'Access-Control-Allow-Origin' '*';
     }
 }
 
+# ReadTheDocs
 server {
-    index index.html index.htm;
-    listen 80;
-    listen 8000 default;
-    server_name  readthedocs.org;
+    index index.html;
+    listen 8000;
+    server_name docs-srv;
     access_log  /var/log/nginx/readthedocs.log host;
+    client_max_body_size 50m;
+
+    add_header X-Frame-Options DENY;
 
     location /favicon.ico {
-        root /home/rtd/venvs/rtd/site/readthedocs.org/media/images;
+        root /home/rtd/site/readthedocs.org/media/images;
         break;
     }
 
     location /robots.txt {
-        root /home/rtd/venvs/rtd/site/readthedocs.org/media;
+        root /home/rtd/site/readthedocs.org/media;
         break;
     }
 
-    location  ~* /docs/(.+)/en/(.+)/(.*) {
-        alias /home/rtd/venvs/rtd/site/readthedocs.org/user_builds/$1/rtd-builds/$2/$3;
-        error_page 404 = @fallback;
-        error_page 500 = @fallback;
-        add_header X-Served Nginx;
+    # Forcibly redirect doc links so we never serve them
+    location  ~* /rtd/(?P<project>.+)/(?P<doc_lang>\w\w)/(?P<doc_version>.+/?)(?P<path>.+) {
+        add_header X-You-Got-Served Nginx;
         add_header X-Deity %(host)s;
-    }
-
-    location  ~* /en/(.+)/(.*) {
-        alias /home/rtd/venvs/rtd/site/readthedocs.org/user_builds/$domain/rtd-builds/$1/$2;
-        error_page 404 = @fallback;
-        error_page 500 = @fallback;
-        add_header X-Served Nginx;
-        add_header X-Deity %(host)s;
-    }
-
-    location  ~* /docs/(?P<project>.+)/en/(?P<version>.+) {
-        rewrite .* http://readthedocs.org/docs/$project/en/$version/;
+        set $proto http;
+        if ( $http_x_ssl = Yup ) {
+            set $proto https;
+        }
+        rewrite ^ $proto://$project.docs-srv/$doc_lang/$doc_version$path permanent;
     }
 
     location / {
-        proxy_pass http://127.0.0.1:8888;
+        proxy_pass http://rtd_app;
         proxy_buffering off;
-        proxy_set_header Host $host:$server_port;
+        proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         add_header X-Deity %(host)s;
     }
 
     location @fallback {
-        proxy_pass http://127.0.0.1:8888;
+        proxy_pass http://rtd_app;
         proxy_buffering off;
-        proxy_set_header Host $host:$server_port;
+        proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         add_header X-Deity %(host)s;
+        add_header X-Fallback True;
     }
 
     location /user_builds/ {
         internal;
-        root   /home/rtd/venvs/rtd/site/readthedocs.org;
+        root /home/rtd/site/readthedocs.org;
+        add_header X-Served nginx-via-django;
+        add_header X-Cname $host;
+        add_header X-Deity %(host)s;
         error_page 404 = @fallback;
         error_page 500 = @fallback;
     }
 }
 
+# Subdomains
 server {
-    listen 80;
+    index index.html;
     listen 8000;
-    server_name ~^(?P<domain>.+).readthedocs.org;
+    server_name ~^(?P<domain>.+).docs-srv;
     access_log  /var/log/nginx/readthedocs.log host;
 
     location /favicon.ico {
-        root /home/rtd/venvs/rtd/site/readthedocs.org/media/images;
+        root /home/rtd/site/readthedocs.org/media/images;
         break;
     }
 
     location /robots.txt {
-        root /home/rtd/venvs/rtd/site/readthedocs.org/media;
+        root /home/rtd/site/readthedocs.org/media;
         break;
     }
 
-    location  ~* /en/(?<version>.+)(?:/(.*)|$) {
-        alias /home/rtd/venvs/rtd/site/readthedocs.org/user_builds/$domain/rtd-builds/$version/$1;
+    location ~ ^/projects/(?P<subproject>.+)/en/(?P<doc_version>.+)/(?P<path>.*) {
+        rewrite_by_lua '
+          if string.find(ngx.var.subproject, "_") then
+            local oldProject = ngx.var.subproject
+            local newProject, n = ngx.re.gsub(oldProject, "_", "-")
+            local uri = ngx.re.gsub(ngx.var.uri, oldProject, newProject)
+            ngx.redirect(ngx.var.scheme .. "://" .. ngx.var.host .. uri)
+          end
+        ';
+        alias /home/rtd/site/readthedocs.org/user_builds/$domain/subprojects/$subproject/../translations/en/$doc_version/$path;
+        add_header X-Served Nginx;
+        add_header X-Subdomain-SubProject-TryFiles True;
+        add_header X-Deity %(host)s;
         error_page 404 = @fallback;
         error_page 500 = @fallback;
+    }
+
+    location / {
+        root /home/rtd/site/readthedocs.org/user_builds/$domain/translations/;
+        try_files $uri $uri/ @single_version;
+        error_page 403 = @single_version;
+        error_page 500 = @single_version;
         add_header X-Served Nginx;
+        add_header X-Subdomain-TryFiles True;
         add_header X-Deity %(host)s;
     }
 
-    location  ~* /(?<lang>\w\w)/(?<version>.+)(?:/(.*)|$) {
-        alias /home/rtd/venvs/rtd/site/readthedocs.org/user_builds/$domain/translations/$lang/$version/$1;
-        error_page 404 = @fallback;
+    location @single_version {
+        root /home/rtd/site/readthedocs.org/user_builds/$domain/single_version/;
+        try_files $uri $uri/ @fallback;
+        error_page 403 = @fallback;
         error_page 500 = @fallback;
         add_header X-Served Nginx;
+        add_header X-Subdomain-SingleVersion True;
         add_header X-Deity %(host)s;
-    }
-
-    location ~ /$ {
-        set $rtd_metadata /home/rtd/venvs/rtd/site/readthedocs.org/user_builds/$domain/metadata.json;
-        perl ReadTheDocs::redirect_home;
     }
 
     location @fallback {
-        proxy_pass http://127.0.0.1:8888;
+        proxy_pass http://rtd_app;
         proxy_buffering off;
-        proxy_set_header Host $host:$server_port;
+        proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         add_header X-Deity %(host)s;
+        add_header X-Fallback True;
+    }
+
+    location /user_builds/ {
+        internal;
+        root /home/rtd/site/readthedocs.org;
+        add_header X-Served nginx-via-django;
+        add_header X-Cname $host;
+        add_header X-Deity %(host)s;
+        error_page 404 = @fallback;
+        error_page 500 = @fallback;
     }
 }
 
+# CNAMEs
 server {
-    listen 8000;
-    server_name sphinxdocs.com www.readthedocs.com readthedocs.com www.readthedocs.org djangowoodies.com;
-    rewrite ^(.*) http://readthedocs.org$1;
-}
+    index index.html;
+    listen 8000 default;
+    access_log /var/log/nginx/readthedocs-cname.log host;
 
-server {
-    listen 8000;
-    server_name ~^(?P<domain>.+).rtfd.org;
+    location /favicon.ico {
+        root /home/rtd/site/readthedocs.org/media/images;
+        break;
+    }
+
+    location /robots.txt {
+        root /home/rtd/site/readthedocs.org/media;
+        break;
+    }
+
+    location ~ ^/projects/(?P<subproject>.+)/en/(?P<doc_version>.+)/(?P<path>.*) {
+        rewrite_by_lua '
+          if string.find(ngx.var.subproject, "_") then
+            local oldProject = ngx.var.subproject
+            local newProject, n = ngx.re.gsub(oldProject, "_", "-")
+            local uri = ngx.re.gsub(ngx.var.uri, oldProject, newProject)
+            ngx.redirect(ngx.var.scheme .. "://" .. ngx.var.host .. uri)
+          end
+        ';
+        alias /home/rtd/site/readthedocs.org/cnametoproject/$host/subprojects/$subproject/../translations/en/$doc_version/$path;
+        add_header X-Served Nginx;
+        add_header X-Subdomain-SubProject-TryFiles True;
+        add_header X-Deity %(host)s;
+        error_page 404 = @fallback;
+        error_page 500 = @fallback;
+    }
+
     location / {
-        proxy_pass http://127.0.0.1:8888;
+        root /home/rtd/site/readthedocs.org/cnametoproject/$host/translations/;
+        try_files $uri $uri/ @single_version;
+        error_page 403 = @single_version;
+        error_page 500 = @single_version;
+        add_header X-Served Nginx;
+        add_header X-Subdomain-TryFiles True;
+        add_header X-Deity %(host)s;
+    }
+
+    location @single_version {
+        root /home/rtd/site/readthedocs.org/cnametoproject/$host/single_version/;
+        try_files $uri $uri/ @fallback;
+        error_page 403 = @fallback;
+        error_page 500 = @fallback;
+        add_header X-Served Nginx;
+        add_header X-Subdomain-SingleVersion True;
+        add_header X-Deity %(host)s;
+    }
+
+    location @fallback {
+        proxy_pass http://rtd_app;
         proxy_buffering off;
-        proxy_set_header Host $host:$server_port;
+        proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         add_header X-Deity %(host)s;
+        add_header X-Fallback True;
     }
-}
 
-server {
-    listen 8000;
-    server_name rtfd.org;
-    rewrite ^(.*)$ http://$domain.readthedocs.org/;
+    location /user_builds/ {
+        internal;
+        root /home/rtd/site/readthedocs.org;
+        error_page 404 = @fallback;
+        error_page 500 = @fallback;
+        add_header X-Served nginx-via-django;
+        add_header X-Cname $host;
+        add_header X-Deity %(host)s;
+    }
 }
