@@ -22,10 +22,20 @@ STATIC_URL = 'http://media.docs-srv/static/'
 ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
+REDIS = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 0,
+}
+
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://localhost:8983/solr',
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+        # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        # 'URL': 'http://localhost:8983/solr',
     }
 }
 
@@ -42,9 +52,9 @@ CACHES = {
 }
 
 # Elasticsearch settings.
-ES_HOSTS = ['localhost:9200']
-ES_DEFAULT_NUM_REPLICAS = 1
-ES_DEFAULT_NUM_SHARDS = 5
+# ES_HOSTS = ['localhost:9200']
+# ES_DEFAULT_NUM_REPLICAS = 1
+# ES_DEFAULT_NUM_SHARDS = 5
 
 SLUMBER_API_HOST = 'http://docs-srv'
 WEBSOCKET_HOST = 'websocket.docs-srv:8088'
@@ -56,7 +66,7 @@ NGINX_X_ACCEL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 
 # Lock builds for 10 minutes
-REPO_LOCK_SECONDS = 300
+# REPO_LOCK_SECONDS = 300
 
 try:
     from local_settings import *  # noqa
