@@ -11,6 +11,7 @@ NUM_WORKERS=3 # how many worker processes should Gunicorn spawn
 DJANGO_SETTINGS_MODULE=settings.local_srv # which settings file should Django use
 
 # Activate the virtual environment
+cd $VENV
 source $VENV/bin/activate
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$APPDIR:$PYTHONPATH
