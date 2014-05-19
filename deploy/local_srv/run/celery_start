@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Parameters
+VENV=/home/rtd
+APPDIR=$VENV/site/readthedocs.org/readthedocs # Django project directory
+DJANGO_SETTINGS_MODULE=settings.local_srv # which settings file should Django use
+
+# Activate the virtual environment
+source $VENV/bin/activate
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$APPDIR:$PYTHONPATH
+
+# Start Celery
+exec $VENV/bin/django-admin.py celeryd \
+--settings $DJANGO_SETTINGS_MODULE \
+-f $VENV/run/celery.log \
+-c 3 -E -B
