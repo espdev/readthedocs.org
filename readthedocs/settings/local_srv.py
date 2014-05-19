@@ -17,8 +17,8 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 CELERY_ALWAYS_EAGER = False
 
-MEDIA_URL = 'http://media.docs-srv/'
-STATIC_URL = 'http://media.docs-srv/static/'
+MEDIA_URL = 'media.docs-srv/'
+STATIC_URL = 'media.docs-srv/static/'
 ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
