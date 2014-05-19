@@ -21,7 +21,7 @@ exec $VENV/bin/gunicorn_django \
 --name $NAME \
 --workers $NUM_WORKERS \
 --user=$USER --group=$GROUP \
---log-level=debug \
+--log-level=error \
 --preload -w 2 \
 --log-level debug \
 --log-file $VENV/run/gunicorn.log \
