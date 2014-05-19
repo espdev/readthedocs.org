@@ -24,4 +24,5 @@ exec $VENV/bin/gunicorn_django \
 --preload -w 2 \
 --log-level debug \
 --log-file $VENV/run/gunicorn.log \
---bind=unix:$SOCKFILE
+-p $VENV/run/gunicorn.pid \
+--bind=127.0.0.1:8888
