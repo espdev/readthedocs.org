@@ -36,7 +36,7 @@ Inside the Nginx config, the variable C<rtd_metadata> should be set to the path
 of the C<metadata.json> path:
 
     location ~ /$ {
-        set $rtd_metadata /home/rtd/venvs/rtd/site/readthedocs.org/user_builds/$domain/metadata.json;
+        set $rtd_metadata /home/rtd/site/readthedocs.org/user_builds/$domain/metadata.json;
         perl ReadTheDocs::redirect_home;
     }
 
