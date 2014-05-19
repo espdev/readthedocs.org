@@ -1,6 +1,5 @@
 # perl_modules perl;
 # perl_require ReadTheDocs.pm;
-port_in_redirect off;
 
 upstream rtd_app {
     # fail_timeout=0 means we always retry an upstream even if it failed
@@ -13,7 +12,7 @@ upstream rtd_app {
 # Media
 server {
     listen 80;
-    server_name media.readthedocs.org;
+    server_name media.docs-srv;
     access_log /var/log/nginx/rtdmedia.log;
 
     gzip on;
