@@ -3,12 +3,11 @@
 # Parameters
 NAME="ReadTheDocs"
 VENV=/home/rtd
-APPDIR=$VENV/site/readthedocs.org/readthedocs # Django project directory
-SOCKFILE=$VENV/run/gunicorn.sock # we will communicte using this unix socket
-USER=rtd # the user to run as
-GROUP=webapps # the group to run as
-NUM_WORKERS=3 # how many worker processes should Gunicorn spawn
-DJANGO_SETTINGS_MODULE=settings.local_srv # which settings file should Django use
+APPDIR=$VENV/site/readthedocs.org/readthedocs
+#SOCKFILE=$VENV/run/gunicorn.sock
+USER=rtd
+NUM_WORKERS=2
+DJANGO_SETTINGS_MODULE=settings.local_srv
 
 # Activate the virtual environment
 source $VENV/bin/activate
@@ -17,11 +16,10 @@ export PYTHONPATH=$APPDIR:$PYTHONPATH
 
 # Start Gunicorn
 exec $VENV/bin/gunicorn_django \
---name $NAME \
---workers $NUM_WORKERS \
---user=$USER --group=$GROUP \
+--name=$NAME \
+--user=$USER \
+--workers=$NUM_WORKERS \
+--preload \
 --log-level=error \
---preload -w 2 \
---log-level debug \
--p $VENV/run/gunicorn.pid \
+--pid=$VENV/run/gunicorn.pid \
 --bind=127.0.0.1:8888
