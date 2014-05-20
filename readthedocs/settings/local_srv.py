@@ -17,6 +17,9 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 CELERY_ALWAYS_EAGER = False
 
+SESSION_COOKIE_DOMAIN = None
+SESSION_COOKIE_HTTPONLY = False
+
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 REDIS = {
