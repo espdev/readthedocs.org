@@ -17,10 +17,6 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 CELERY_ALWAYS_EAGER = False
 
-# MEDIA_URL = 'media.docs-srv/'
-# STATIC_URL = 'media.docs-srv/static/'
-# ADMIN_MEDIA_PREFIX = MEDIA_URL + 'admin/'
-
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 REDIS = {
@@ -44,7 +40,7 @@ CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': 'localhost:6379',
-        'PREFIX': 'docs',
+        'PREFIX': 'rtd',
         'OPTIONS': {
             'DB': 1,
             'PARSER_CLASS': 'redis.connection.HiredisParser'
@@ -57,7 +53,10 @@ CACHES = {
 # ES_DEFAULT_NUM_REPLICAS = 1
 # ES_DEFAULT_NUM_SHARDS = 5
 
+SLUMBER_USERNAME = 'test'
+SLUMBER_PASSWORD = 'test'
 SLUMBER_API_HOST = 'http://docs-srv'
+
 WEBSOCKET_HOST = 'websocket.docs-srv:8088'
 
 PRODUCTION_DOMAIN = 'docs-srv'
