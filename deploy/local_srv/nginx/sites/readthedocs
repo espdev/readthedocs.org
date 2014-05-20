@@ -1,32 +1,6 @@
-perl_modules perl;
-perl_require ReadTheDocs.pm;
+#perl_modules perl;
+#perl_require ReadTheDocs.pm;
 
-
-# Media
-#server {
-#    listen 8000;
-#    server_name media.docs-srv;
-#    access_log /var/log/nginx/rtdmedia.log;
-#
-#    gzip on;
-#    gzip_vary on;
-#
-#    location /wheelhouse/ {
-#        expires 60d;
-#        root /home/rtd/site/readthedocs.org/media;
-#        add_header X-Deity %(host)s;
-#        autoindex on;
-#        autoindex_exact_size off;
-#        autoindex_localtime on;
-#    }
-#
-#    location / {
-#        expires 7d;
-#        root /home/rtd/site/readthedocs.org/media;
-#        add_header X-Deity %(host)s;
-#        add_header 'Access-Control-Allow-Origin' '*';
-#    }
-#}
 
 # ReadTheDocs
 server {
@@ -160,74 +134,5 @@ server {
         add_header X-Deity %(host)s;
         error_page 404 = @fallback;
         error_page 500 = @fallback;
-    }
-}
-
-# CNAMEs
-server {
-    index index.html;
-    listen 80 default;
-    access_log /var/log/nginx/readthedocs-cname.log host;
-
-    location /favicon.ico {
-        root /home/rtd/site/readthedocs.org/media/images;
-        break;
-    }
-
-    location ~ ^/projects/(?P<subproject>.+)/en/(?P<doc_version>.+)/(?P<path>.*) {
-        rewrite_by_lua '
-          if string.find(ngx.var.subproject, "_") then
-            local oldProject = ngx.var.subproject
-            local newProject, n = ngx.re.gsub(oldProject, "_", "-")
-            local uri = ngx.re.gsub(ngx.var.uri, oldProject, newProject)
-            ngx.redirect(ngx.var.scheme .. "://" .. ngx.var.host .. uri)
-          end
-        ';
-        alias /home/rtd/site/readthedocs.org/cnametoproject/$host/subprojects/$subproject/../translations/en/$doc_version/$path;
-        add_header X-Served Nginx;
-        add_header X-Subdomain-SubProject-TryFiles True;
-        add_header X-Deity %(host)s;
-        error_page 404 = @fallback;
-        error_page 500 = @fallback;
-    }
-
-    location / {
-        root /home/rtd/site/readthedocs.org/cnametoproject/$host/translations/;
-        try_files $uri $uri/ @single_version;
-        error_page 403 = @single_version;
-        error_page 500 = @single_version;
-        add_header X-Served Nginx;
-        add_header X-Subdomain-TryFiles True;
-        add_header X-Deity %(host)s;
-    }
-
-    location @single_version {
-        root /home/rtd/site/readthedocs.org/cnametoproject/$host/single_version/;
-        try_files $uri $uri/ @fallback;
-        error_page 403 = @fallback;
-        error_page 500 = @fallback;
-        add_header X-Served Nginx;
-        add_header X-Subdomain-SingleVersion True;
-        add_header X-Deity %(host)s;
-    }
-
-    location @fallback {
-        proxy_pass http://127.0.0.1:8888;
-        proxy_buffering off;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        add_header X-Deity %(host)s;
-        add_header X-Fallback True;
-    }
-
-    location /user_builds/ {
-        internal;
-        root /home/rtd/site/readthedocs.org;
-        error_page 404 = @fallback;
-        error_page 500 = @fallback;
-        add_header X-Served nginx-via-django;
-        add_header X-Cname $host;
-        add_header X-Deity %(host)s;
     }
 }
