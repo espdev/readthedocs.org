@@ -12,6 +12,7 @@ DJANGO_SETTINGS_MODULE=settings.local_srv
 # Activate the virtual environment
 source $VENV/bin/activate
 
+export HOME=$VENV
 export P4CONFIG=$VENV/.p4config
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$APPDIR:$PYTHONPATH
