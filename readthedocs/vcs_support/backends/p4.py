@@ -11,10 +11,10 @@ You should use this backend for build projects from Perforce VCS.
         - P4USER
         - P4PASSWD
         - P4PORT
-        - P4CLIENT=readthedocs-perforce-backend
+        - P4CLIENT
 
-This backend use client (workspace) ``readthedocs-perforce-backend``. This
-client must be created for your Perforce environment (user/server).
+This backend uses a client (workspace). A client must be created 
+for your Perforce environment (user/server).
 
 You should set ``Repo`` in the project settings as::
 
@@ -29,7 +29,7 @@ Where::
 .. note::
 
     * This backend supports versions as perforce labels.
-    * This backend uses P4Python API. It must be installed.
+    * This backend uses p4 console client and P4Python API.
 
 """
 
@@ -41,15 +41,10 @@ from vcs_support.base import BaseVCS, VCSVersion
 try:
     from P4 import P4, P4Exception
 except ImportError:
-    # FIXME: Use p4 client directly?
-
     raise ProjectImportError((
-        'Cannot import P4Python. You must install Perforce Python API.\n'
+        'Cannot import P4Python. You must install Perforce p4 console client and Python API.\n'
         + 'See: http://www.perforce.com/perforce/doc.current/manuals/p4script/03_python.html'
     ))
-
-# You must create this client manually for your perforce environment
-BACKEND_CLIENT = 'readthedocs-perforce-backend'
 
 
 class Backend(BaseVCS):
@@ -77,15 +72,15 @@ class Backend(BaseVCS):
         except P4Exception as err:
             # Oops... any problems о_О
             raise ProjectImportError(
-                'Damn! Cannot login to Perforce server.\n{}'.format(err))
+                'Cannot login to Perforce server.\n{}'.format(err))
 
         self.p4 = p4
 
     def __del__(self):
         try:
             self.p4.disconnect()
-        except P4Exception as err:
-            print err
+        except P4Exception:
+            pass
 
     def update(self):
         super(Backend, self).update()
@@ -135,17 +130,15 @@ class Backend(BaseVCS):
 
     def _update_client(self):
         try:
-            # Change client and change root for current project
-            self.p4.client = BACKEND_CLIENT
-
-            client = self.p4.fetch_client('-t', BACKEND_CLIENT)
+            # Change client root for current project
+            client = self.p4.fetch_client()
             client['Root'] = self.working_dir
 
             self.p4.save_client(client)
         except P4Exception as err:
             raise ProjectImportError(
                 'Failed to update client "{}".\n{}\n'.format(
-                    BACKEND_CLIENT, err))
+                    self.p4.client, err))
 
     def _get_depot_url(self):
         depot_url = self.repo_url.rstrip('/')
@@ -158,8 +151,8 @@ class Backend(BaseVCS):
     def _revert(self):
         try:
             self.p4.run_revert(self._get_depot_url())
-        except P4Exception as err:
-            print err
+        except P4Exception:
+            pass
 
     def _sync(self, identifier):
         depot_url = self._get_depot_url()
