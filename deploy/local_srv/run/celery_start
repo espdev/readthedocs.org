@@ -4,13 +4,11 @@
 VENV=/home/rtd
 APPDIR=$VENV/site/readthedocs.org/readthedocs
 DJANGO_SETTINGS_MODULE=settings.local_srv
-CONCURRENCY=1
+CONCURRENCY=2
 
 # Activate the virtual environment
 source $VENV/bin/activate
 
-export HOME=$VENV
-export P4CONFIG=$VENV/.p4config
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$APPDIR:$PYTHONPATH
 
