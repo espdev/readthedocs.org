@@ -68,9 +68,16 @@ class Backend(BaseVCS):
         try:
             if not p4.connected():
                 p4.connect()
+        except P4Exception as err:
+            raise ProjectImportError(
+                'Cannot connect to Perforce server.\n{}'.format(err))
+
+        try:
             p4.run_login()
         except P4Exception as err:
-            raise ProjectImportError('{}'.format(err))
+            # Oops... any problems о_О
+            raise ProjectImportError(
+                'Damn! Cannot login to Perforce server.\n{}'.format(err))
 
         self.p4 = p4
 
