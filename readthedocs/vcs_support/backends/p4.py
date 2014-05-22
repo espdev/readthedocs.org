@@ -13,7 +13,7 @@ You should use this backend for build projects from Perforce VCS.
         - P4PORT
         - P4CLIENT
 
-This backend uses a client (workspace). A client must be created 
+This backend uses a client (workspace). A client must be created
 for your Perforce environment (user/server).
 
 You should set ``Repo`` in the project settings as::
@@ -53,7 +53,7 @@ class Backend(BaseVCS):
 
     supports_tags = True
     supports_branches = False
-    fallback_branch = ''
+    fallback_branch = '#head'
 
     def __init__(self, project, version):
         super(Backend, self).__init__(project, version)
@@ -101,7 +101,7 @@ class Backend(BaseVCS):
 
         for label in labels:
             label_name = label['label']
-            vcs_tags.append(VCSVersion(self, label_name, label_name))
+            vcs_tags.append(VCSVersion(self, '@'+label_name, label_name))
 
         return vcs_tags
 
@@ -159,14 +159,14 @@ class Backend(BaseVCS):
 
         if identifier:
             # Use a specified changelist or label
-            depot_url += '@{}'.format(identifier)
+            depot_url += identifier
 
         try:
             info = self.p4.run_sync('-f', depot_url)
         except P4Exception as err:
             raise ProjectImportError(
                 "Failed to sync code from '{}'. Error:\n{}\n".format(
-                    self.repo_url, err)
+                    depot_url, err)
             )
 
         for rootdir, dirnames, filenames in os.walk(self.working_dir):
