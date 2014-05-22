@@ -33,9 +33,8 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
-        # 'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        # 'URL': 'http://localhost:8983/solr',
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://localhost:8983/solr',
     }
 }
 
@@ -52,9 +51,9 @@ CACHES = {
 }
 
 # Elasticsearch settings.
-# ES_HOSTS = ['localhost:9200']
-# ES_DEFAULT_NUM_REPLICAS = 1
-# ES_DEFAULT_NUM_SHARDS = 5
+ES_HOSTS = ['127.0.0.1:9200']
+ES_DEFAULT_NUM_REPLICAS = 0
+ES_DEFAULT_NUM_SHARDS = 5
 
 SLUMBER_USERNAME = 'test'
 SLUMBER_PASSWORD = 'test'
