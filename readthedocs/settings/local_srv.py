@@ -67,6 +67,8 @@ NGINX_X_ACCEL_REDIRECT = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
 
+DEFAULT_FROM_EMAIL = "no-reply@docs-srv"
+
 # Lock builds for 10 minutes
 # REPO_LOCK_SECONDS = 300
 
