@@ -3,77 +3,76 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# ferm32 <ferm32@gmail.com>, 2013-2014
-# Донер Кебаб <pentusha@gmail.com>, 2014
+# Bashar Al-Abdulhadi, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: readthedocs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-04-24 16:42-0500\n"
-"PO-Revision-Date: 2014-05-04 12:00+0000\n"
-"Last-Translator: ferm32 <ferm32@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/readthedocs/language/ru/)\n"
+"PO-Revision-Date: 2014-04-24 21:43+0000\n"
+"Last-Translator: Eric Holscher <eric@ericholscher.com>\n"
+"Language-Team: Arabic (http://www.transifex.com/projects/p/readthedocs/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: api/utils.py:86
 msgid "Sorry, no results on that page."
-msgstr "Извините, на этой странице ничего не найдено."
+msgstr "عذرا, لا توجد نتائج في تلك الصفحة."
 
 #: api/utils.py:169
 #, python-format
 msgid "Invalid resource lookup data provided (mismatched type).: %(error)s"
-msgstr "Для просмотра ресурса предоставлены неверные данные (не совпадает тип): %(error)s"
+msgstr ""
 
 #: bookmarks/models.py:9 builds/models.py:83 builds/models.py:277
 #: builds/models.py:293 projects/models.py:809
 msgid "Project"
-msgstr "Проект"
+msgstr "المشروع"
 
 #: bookmarks/models.py:11 core/models.py:14 projects/models.py:100
 msgid "User"
-msgstr "Пользователь"
+msgstr "المستخدم"
 
 #: bookmarks/models.py:13 builds/models.py:301
 msgid "Date"
-msgstr "Дата"
+msgstr "التاريخ"
 
 #: bookmarks/models.py:14 templates/djangome/show.html:12
 msgid "URL"
-msgstr "URL"
+msgstr "العنوان"
 
 #: bookmarks/models.py:15 projects/models.py:104
 #: templates/core/project_details.html:5
 msgid "Description"
-msgstr "Описание"
+msgstr "الوصف"
 
 #: bookmarks/models.py:21
 #, python-format
 msgid "Bookmark %(url)s for %(user)s (%(pk)s)"
-msgstr "Добавить %(url)s в закладки для %(user)s (%(pk)s)"
+msgstr ""
 
 #: builds/constants.py:4
 msgid "Triggered"
-msgstr "Срабатывает"
+msgstr "أثار"
 
 #: builds/constants.py:5
 msgid "Cloning"
-msgstr "Клонирование"
+msgstr ""
 
 #: builds/constants.py:6
 msgid "Installing"
-msgstr "Установка"
+msgstr ""
 
 #: builds/constants.py:7
 msgid "Building"
-msgstr "Формирование"
+msgstr "البناء"
 
 #: builds/constants.py:8
 msgid "Finished"
-msgstr "Завершено"
+msgstr "انتهى"
 
 #: builds/constants.py:12
 msgid "HTML"
@@ -89,185 +88,185 @@ msgstr "Epub"
 
 #: builds/constants.py:15
 msgid "Manpage"
-msgstr "Страница руководства (manpage)"
+msgstr "صفحة التعليمات"
 
 #: builds/constants.py:16
 msgid "Dash"
-msgstr "Dash"
+msgstr ""
 
 #: builds/constants.py:20
 msgid "Branch"
-msgstr "Ветка"
+msgstr ""
 
 #: builds/constants.py:21 builds/filters.py:19
 msgid "Tag"
-msgstr "Тэг"
+msgstr ""
 
 #: builds/constants.py:22
 msgid "Unknown"
-msgstr "Неизв."
+msgstr ""
 
 #: builds/filters.py:10 projects/filters.py:9
 msgid "Any"
-msgstr "Любой"
+msgstr ""
 
 #: builds/filters.py:17 builds/filters.py:29 projects/filters.py:31
 #: projects/models.py:102 projects/models.py:813
 msgid "Name"
-msgstr "Имя"
+msgstr "الاسم"
 
 #: builds/filters.py:38
 msgid "Build Date"
-msgstr "Дата сборки"
+msgstr ""
 
 #: builds/filters.py:39
 msgid "Build Type"
-msgstr "Тип сборки"
+msgstr ""
 
 #: builds/models.py:86 builds/models.py:297
 msgid "Type"
-msgstr "Тип"
+msgstr "النوع"
 
 #: builds/models.py:90
 msgid "Identifier"
-msgstr "Идентификатор"
+msgstr "معرّف"
 
 #: builds/models.py:92
 msgid "Verbose Name"
-msgstr "Подробное наименование"
+msgstr "اسم مطوّل"
 
 #: builds/models.py:93 projects/filters.py:33 projects/models.py:103
 #: projects/models.py:814
 msgid "Slug"
-msgstr "Идёт с трудом"
+msgstr "Slug"
 
 #: builds/models.py:95
 msgid "Supported"
-msgstr "Поддерживается"
+msgstr ""
 
 #: builds/models.py:96 templates/projects/project_versions.html:46
 msgid "Active"
-msgstr "Активно"
+msgstr "فعّال"
 
 #: builds/models.py:97 templates/projects/includes/icon_built.html:4
 msgid "Built"
-msgstr "Сформировано"
+msgstr "بني"
 
 #: builds/models.py:98 templates/projects/includes/icon_built.html:7
 msgid "Uploaded"
-msgstr "Загружено"
+msgstr "تم الرفع"
 
 #: builds/models.py:100 projects/models.py:195
 msgid "Privacy Level"
-msgstr "Уровень приватности"
+msgstr ""
 
 #: builds/models.py:101
 msgid "Level of privacy for this Version."
-msgstr "Уровень приватности для этой версии."
+msgstr ""
 
 #. Translators: Permission around whether a user can view the
 #. version
 #: builds/models.py:112
 msgid "View Version"
-msgstr "Просмотреть версию"
+msgstr ""
 
 #: builds/models.py:116
 #, python-format
 msgid "Version %(version)s of %(project)s (%(pk)s)"
-msgstr "%(project)s (%(pk)s), версия %(version)s"
+msgstr ""
 
 #: builds/models.py:279
 msgid "From slug"
-msgstr "Из slug"
+msgstr "من Slug"
 
 #: builds/models.py:280
 msgid "To slug"
-msgstr "В slug"
+msgstr "إلى Slug"
 
 #: builds/models.py:282
 msgid "Largest"
-msgstr "Самый большой"
+msgstr "الأكبر"
 
 #: builds/models.py:285
 #, python-format
 msgid "Alias for %(project)s: %(from)s -> %(to)s"
-msgstr "Псевдоним для %(project)s: %(from)s -> %(to)s"
+msgstr ""
 
 #: builds/models.py:295 projects/models.py:119 projects/models.py:811
 #: templates/djangome/oneoffs.html:11
 msgid "Version"
-msgstr "Версия"
+msgstr "الإصدار"
 
 #: builds/models.py:299
 msgid "State"
-msgstr "Страна"
+msgstr "الوضعية"
 
 #: builds/models.py:302
 msgid "Success"
-msgstr "Успешно"
+msgstr "نجاح"
 
 #: builds/models.py:304
 msgid "Setup"
-msgstr "Настройка"
+msgstr "إعداد"
 
 #: builds/models.py:305
 msgid "Setup error"
-msgstr "Ошибка настройки"
+msgstr "إعداد خاطئ"
 
 #: builds/models.py:306
 msgid "Output"
-msgstr "Вывод"
+msgstr "الناتج"
 
 #: builds/models.py:307
 msgid "Error"
-msgstr "Ошибка"
+msgstr "خطأ"
 
 #: builds/models.py:308
 msgid "Exit code"
-msgstr "Код завершения"
+msgstr ""
 
 #: builds/models.py:316
 #, python-format
 msgid "Build %(project)s for %(usernames)s (%(pk)s)"
-msgstr "Сформировать %(project)s для %(usernames)s (%(pk)s)"
+msgstr ""
 
 #: core/forms.py:14
 msgid "First name"
-msgstr "Имя"
+msgstr "الاسم الأول"
 
 #: core/forms.py:15
 msgid "Last name"
-msgstr "Фамилия"
+msgstr "اسم العائلة"
 
 #: core/middleware.py:70
 msgid "Invalid hostname"
-msgstr "Неверное имя хоста"
+msgstr "اسم مضيف غير صالح"
 
 #: core/models.py:16
 msgid "Whitelisted"
-msgstr "Внесено в белый список"
+msgstr "إضافة للقائمة البيضاء"
 
 #: core/models.py:17
 msgid "Homepage"
-msgstr "Домашняя страница"
+msgstr "الصفحة الرئيسية"
 
 #: core/models.py:18
 msgid "Allow email"
-msgstr "Разрешить использование e-mail"
+msgstr "السماح لبريد"
 
 #: core/models.py:19
 msgid "Show your email on VCS contributions."
-msgstr "Показывать в списке контрибьютеров ваш e-mail"
+msgstr "عرض بريدك الإلكتروني في صفحة مساهمات VCS"
 
 #: core/models.py:24
 #, python-format
 msgid "%(username)s's profile"
-msgstr "Профиль %(username)s"
+msgstr "الملف الشخصي لـ %(username)s"
 
 #: djangome/views.py:25
 #, python-format
 msgid "Please enter a valid URL on %s"
-msgstr "Пожалуйста, введите для %s верный URL"
+msgstr "الرجاء إدخال عنوان صحيح على %s"
 
 #: projects/constants.py:18
 msgid "Sphinx Html"
@@ -279,31 +278,31 @@ msgstr "Sphinx HtmlDir"
 
 #: projects/constants.py:20
 msgid "Sphinx Single Page HTML"
-msgstr "Одностраничный документ HTML Sphinx"
+msgstr ""
 
 #: projects/constants.py:21
 msgid "Mkdocs"
-msgstr "Mkdocs"
+msgstr ""
 
 #. Translators: This is a name of a Sphinx theme.
 #: projects/constants.py:29
 msgid "Default"
-msgstr "По умолчанию"
+msgstr "الإفتراضي"
 
 #. Translators: This is a name of a Sphinx theme.
 #: projects/constants.py:31
 msgid "Sphinx Docs"
-msgstr "Документация Sphinx"
+msgstr "مستندات Sphinx"
 
 #. Translators: This is a name of a Sphinx theme.
 #: projects/constants.py:35
 msgid "Traditional"
-msgstr "Традиционный"
+msgstr "تقليدي"
 
 #. Translators: This is a name of a Sphinx theme.
 #: projects/constants.py:37
 msgid "Nature"
-msgstr "Тип"
+msgstr "طبيعة"
 
 #. Translators: This is a name of a Sphinx theme.
 #: projects/constants.py:39
@@ -312,11 +311,11 @@ msgstr "Haiku"
 
 #: projects/constants.py:68
 msgid "Live"
-msgstr "Живой"
+msgstr "مباشر"
 
 #: projects/constants.py:69
 msgid "Deleted"
-msgstr "Удалён"
+msgstr "حُذف"
 
 #: projects/constants.py:73
 msgid "Git"
@@ -336,204 +335,204 @@ msgstr "Bazaar"
 
 #: projects/constants.py:84
 msgid "Public"
-msgstr "Общедоступный"
+msgstr ""
 
 #: projects/constants.py:85
 msgid "Protected"
-msgstr "Защищённый"
+msgstr ""
 
 #: projects/constants.py:86
 msgid "Private"
-msgstr "Личный"
+msgstr ""
 
 #: projects/constants.py:97
 msgid "CPython 2.x"
-msgstr "CPython 2.x"
+msgstr ""
 
 #: projects/constants.py:98
 msgid "CPython 3.x"
-msgstr "CPython 3.x"
+msgstr ""
 
 #: projects/filters.py:34
 msgid "Created Date"
-msgstr "Дата создания"
+msgstr ""
 
 #: projects/filters.py:36 projects/models.py:107
 msgid "Repository URL"
-msgstr "URL репозитория"
+msgstr "عنوان المستودع"
 
 #: projects/filters.py:39
 msgid "Repository Type"
-msgstr "Тип репозитория"
+msgstr ""
 
 #: projects/forms.py:23
 msgid "A project with that name exists already!"
-msgstr "Проект с таким названием уже существует!"
+msgstr "هناك مشروع بهذا الاسم موجود سلفا!"
 
 #: projects/forms.py:31
 msgid ""
 "URL for your code (hg or git). Ex. http://github.com/ericholscher/django-"
 "kong.git"
-msgstr "URL вашего кода (hg или git). Например, http://github.com/ericholscher/django-kong.git"
+msgstr ""
 
 #: projects/forms.py:52
 msgid "Invalid character in repo name"
-msgstr "Неверный символ в имени репозитория"
+msgstr ""
 
 #: projects/forms.py:55
 msgid ""
 "It looks like you entered a private repo - please use the public (http:// or"
 " git://) clone url"
-msgstr "Похоже, вы указали приватный репозиторий - пожалуйста, используйте общедоступный для клонирования (http:// или git://) url"
+msgstr ""
 
 #: projects/forms.py:72 projects/models.py:185
 msgid "(Beta) The Python interpreter used to create the virtual environment."
-msgstr "(Beta) Интерпретатор Python, используемый для создания виртуального окружения virtualenv."
+msgstr ""
 
 #: projects/forms.py:101
 msgid ""
 "Your configuration file is invalid, make sure it contains conf.py in it."
-msgstr "У вас неверный конфигурационный файл, убедитесь, что он содержит conf.py."
+msgstr ""
 
 #: projects/forms.py:170 templates/core/project_details.html:152
 msgid "Default Version"
-msgstr "Версия по умолчанию"
+msgstr ""
 
 #: projects/forms.py:193
 msgid "Zip file of HTML"
-msgstr "Zip-файл или HTML"
+msgstr "ملف مضغوط من ملفات HTML"
 
 #: projects/forms.py:195
 msgid "Overwrite existing HTML?"
-msgstr "Перезаписать существующий HTML?"
+msgstr ""
 
 #: projects/forms.py:208
 msgid "That version is already active!"
-msgstr "Эта версия и так активна!"
+msgstr ""
 
 #: projects/forms.py:210
 msgid "Must upload a zip file."
-msgstr "Необходимо загрузить zip-файл."
+msgstr "يجب رفع ملف مضغوط."
 
 #: projects/forms.py:224
 msgid "Version of the project you are uploading HTML for"
-msgstr "Версия проекта, для которой вы загрузили HTML"
+msgstr ""
 
 #: projects/forms.py:241 projects/forms.py:300
 #, python-format
 msgid "Project %(name)s does not exist"
-msgstr "Проекта %(name)s не существует"
+msgstr ""
 
 #: projects/forms.py:262
 #, python-format
 msgid "User %(name)s does not exist"
-msgstr "Пользователя %(name)s не существует"
+msgstr ""
 
 #: projects/models.py:80
 msgid "Parent"
-msgstr "Родительский"
+msgstr "أبوي"
 
 #: projects/models.py:82
 msgid "Child"
-msgstr "Дочерний"
+msgstr "بنوي"
 
 #: projects/models.py:96
 msgid "Publication date"
-msgstr "Дата публикации"
+msgstr "تاريخ النشر"
 
 #: projects/models.py:97
 msgid "Modified date"
-msgstr "Дата последнего изменения"
+msgstr "تاريخ التعديل"
 
 #: projects/models.py:105
 msgid "The reStructuredText description of the project"
-msgstr "Описание проекта в формате reStructuredText"
+msgstr ""
 
 #: projects/models.py:108
 msgid ""
 "Checkout URL for your code (hg, git, etc.). Ex. "
 "http://github.com/ericholscher/django-kong.git"
-msgstr "URL, по которому будет проверяться ваш код (hg, git, etc.). Напр. http://github.com/ericholscher/django-kong.git"
+msgstr ""
 
 #: projects/models.py:111
 msgid "Repository type"
-msgstr "Тип репозитория"
+msgstr "نوع المستودع"
 
 #: projects/models.py:113
 msgid "Project URL"
-msgstr "URL проекта"
+msgstr "عنوان رابط المشروع"
 
 #: projects/models.py:114
 msgid "The project's homepage"
-msgstr "Домашняя страница проекта"
+msgstr "الصفحة الرئيسية للمشروع"
 
 #: projects/models.py:116
 msgid "Canonical URL"
-msgstr "Канонический URL"
+msgstr ""
 
 #: projects/models.py:117
 msgid ""
 "The official URL that the docs live at. This can be at readthedocs.org, or "
 "somewhere else. Ex. http://docs.fabfile.org"
-msgstr "Официальный URL для документации. Он может быть и на readthedocs.org, и где-то в другом месте, например, http://docs.fabfile.org"
+msgstr ""
 
 #: projects/models.py:120
 msgid "Project version these docs apply to, i.e. 1.0a"
-msgstr "К какой версии проекта относится данная документация, например, 1.0a"
+msgstr ""
 
 #: projects/models.py:122 templates/sphinx/sphinx_rtd_theme/layout.html:58
 #: templates/sphinx/sphinx_rtd_theme/layout_old.html:140
 msgid "Copyright"
-msgstr "© (авторские права)"
+msgstr "حق النشر"
 
 #: projects/models.py:123
 msgid "Project copyright information"
-msgstr "Информация об авторских правах на проект"
+msgstr "معلومات حقوق نشر المشروع"
 
 #: projects/models.py:125
 msgid "Theme"
-msgstr "Тема"
+msgstr "القالب"
 
 #: projects/models.py:128
 msgid "Examples"
-msgstr "Примеры"
+msgstr "أمثلة"
 
 #: projects/models.py:129
 msgid "Suffix"
-msgstr "Суффикс"
+msgstr "لاحقة"
 
 #: projects/models.py:132
 msgid "Single version"
-msgstr "Единственная версия"
+msgstr ""
 
 #: projects/models.py:133
 msgid ""
 "A single version site has no translations and only your \"latest\" version, "
 "served at the root of the domain. Use this with caution, only turn it on if "
 "you will <b>never</b> have multiple versions of your docs."
-msgstr "Сайт с одной версией и без переводов, с последней - latest версией, выдаётся при обращении к корневой папке домена. Используйте с осторожностью и только если <b>точно</b> не планируете в будущем иметь несколько версий вашей документации."
+msgstr ""
 
 #: projects/models.py:135
 msgid "Default version"
-msgstr "Версия по умолчанию"
+msgstr "الإصدار الإفتراضي"
 
 #: projects/models.py:136
 msgid "The version of your project that / redirects to"
-msgstr "На какую версию вашего проекта идёт перенаправление с /"
+msgstr ""
 
 #: projects/models.py:140
 msgid "Default branch"
-msgstr "Ветка по умолчанию"
+msgstr ""
 
 #: projects/models.py:141
 msgid ""
 "What branch \"latest\" points to. Leave empty to use the default value for "
 "your VCS (eg. trunk or master)."
-msgstr "Ветка, на которую указывает \"latest\". Не заполняйте, чтобы использовать значение по умолчанию для вашей VCS (напр. trunk или master)"
+msgstr ""
 
 #: projects/models.py:145
 msgid "Requirements file"
-msgstr "Файл с описанием требований, англ. requirements"
+msgstr "ملف المتطلبات"
 
 #: projects/models.py:147
 msgid ""
@@ -541,226 +540,226 @@ msgid ""
 "installer.org/en/latest/cookbook.html#requirements-files\">pip requirements "
 "file</a> needed to build your documentation. Path from the root of your "
 "project."
-msgstr "Требуется Virtualenv. Для формирования вашей документации нужен <a href=\"http://www.pip-installer.org/en/latest/cookbook.html#requirements-files\">файл с требованиями pip</a>. Путь от корня вашего проекта."
+msgstr ""
 
 #: projects/models.py:152
 msgid "Documentation type"
-msgstr "Тип документации"
+msgstr ""
 
 #: projects/models.py:154
 msgid ""
 "Type of documentation you are building. <a href=\"http://sphinx-"
 "doc.org/builders.html#sphinx.builders.html.DirectoryHTMLBuilder\">More "
 "info</a>."
-msgstr "Тип формируемой вами документации. <a href=\"http://sphinx-doc.org/builders.html#sphinx.builders.html.DirectoryHTMLBuilder\">Дополнительная информация</a>."
+msgstr ""
 
 #: projects/models.py:158
 msgid "Analytics code"
-msgstr "Код для аналитики"
+msgstr "رمز الإحصائيات"
 
 #: projects/models.py:159
 msgid ""
 "Google Analytics Tracking ID (ex. UA-22345342-1). This may slow down your "
 "page loads."
-msgstr "Google Analytics Tracking ID (напр. UA-22345342-1). Может замедлить загрузку ваших страниц."
+msgstr ""
 
 #: projects/models.py:163 projects/models.py:815
 msgid "Path"
-msgstr "Путь"
+msgstr "المسار"
 
 #: projects/models.py:164
 msgid "The directory where conf.py lives"
-msgstr "Папка, где находится conf.py"
+msgstr ""
 
 #: projects/models.py:166
 msgid "Python configuration file"
-msgstr "Файл конфигурации в формате синтаксиса Python"
+msgstr ""
 
 #: projects/models.py:167
 msgid ""
 "Path from project root to conf.py file (ex. docs/conf.py). Leave blank if "
 "you want us to find it for you."
-msgstr "Путь от корневой папки проекта к файлу conf.py (напр., docs/conf.py). Не заполняйте, чтобы мы поискали его сами."
+msgstr ""
 
 #: projects/models.py:170
 msgid "Featured"
-msgstr "Особенные"
+msgstr "مميز"
 
 #: projects/models.py:171
 msgid "Skip"
-msgstr "Пропустить"
+msgstr "تخطي"
 
 #: projects/models.py:172
 msgid "Mirror"
-msgstr "Зеркало"
+msgstr ""
 
 #: projects/models.py:174
 msgid "Use virtualenv"
-msgstr "Использовать virtualenv"
+msgstr ""
 
 #: projects/models.py:175
 msgid "Install your project inside a virtualenv using setup.py install"
-msgstr "Развернуть ваш проект внутри virtualenv с использованием setup.py install"
+msgstr ""
 
 #: projects/models.py:181
 msgid "Python Interpreter"
-msgstr "Интерпретатор Python"
+msgstr ""
 
 #: projects/models.py:189
 msgid "Use system packages"
-msgstr "Использовать пакеты системы"
+msgstr ""
 
 #: projects/models.py:190
 msgid "Give the virtual environment access to the global site-packages dir."
-msgstr "Дать виртуальному окружению доступ к общесистемной папке с пакетами site-packages."
+msgstr ""
 
 #: projects/models.py:192
 msgid "Django Packages URL"
-msgstr "URL пакетов Django"
+msgstr ""
 
 #: projects/models.py:197
 msgid ""
 "(Beta) Level of privacy that you want on the repository. Protected means "
 "public but not in listings."
-msgstr "(Beta) Желаемый уровень приватности репозитория. Защищённый означает общедоступный, но не присутствующий в списках."
+msgstr ""
 
 #: projects/models.py:200
 msgid "Version Privacy Level"
-msgstr "Уровень приватности версии"
+msgstr ""
 
 #: projects/models.py:202
 msgid ""
 "(Beta) Default level of privacy you want on built versions of documentation."
-msgstr "(Beta) Уровень желаемой приватности по умолчанию для формируемых версий документации."
+msgstr ""
 
 #: projects/models.py:207
 msgid "Related projects"
-msgstr "Связанные проекты"
+msgstr ""
 
 #: projects/models.py:223
 msgid "Number of Major versions"
-msgstr "Количество мажорных версий"
+msgstr ""
 
 #: projects/models.py:228
 msgid "2 means supporting 3.X.X and 2.X.X, but not 1.X.X"
-msgstr "2 означает поддержку 3.X.X и 2.X.X, но не 1.X.X"
+msgstr ""
 
 #: projects/models.py:231
 msgid "Number of Minor versions"
-msgstr "Количество минорных версий"
+msgstr ""
 
 #: projects/models.py:236
 msgid "2 means supporting 2.2.X and 2.1.X, but not 2.0.X"
-msgstr "2 означает поддержку 2.2.X и 2.1.X, но не 2.0.X"
+msgstr ""
 
 #: projects/models.py:239
 msgid "Number of Point versions"
-msgstr "Количество версий с точками"
+msgstr ""
 
 #: projects/models.py:244
 msgid "2 means supporting 2.2.2 and 2.2.1, but not 2.2.0"
-msgstr "2 означает поддержку 2.2.2 и 2.2.1, но не 2.2.0"
+msgstr ""
 
 #. Translators: Permission around whether a user can view the
 #. project
 #: projects/models.py:255
 msgid "View Project"
-msgstr "Просмотреть проект"
+msgstr ""
 
 #: projects/models.py:282
 msgid "Model must have slug"
-msgstr "В модели должен быть slug"
+msgstr ""
 
 #: projects/models.py:816
 msgid "MD5 checksum"
-msgstr "Контрольная сумма MD5"
+msgstr ""
 
 #: projects/models.py:844
 msgid "URL to send the webhook to"
-msgstr "URL, на которые следует отправлять webhook"
+msgstr ""
 
 #: settings/base.py:55
 msgid "English"
-msgstr "Английский"
+msgstr "الإنجليزية"
 
 #: settings/base.py:56
 msgid "Spanish"
-msgstr "Испанский"
+msgstr ""
 
 #: settings/base.py:57
 msgid "Norwegian Bokmål"
-msgstr "Норвежский"
+msgstr ""
 
 #: settings/base.py:58
 msgid "French"
-msgstr "Французский"
+msgstr ""
 
 #: settings/base.py:59
 msgid "Russian"
-msgstr "Русский"
+msgstr ""
 
 #: settings/base.py:60
 msgid "German"
-msgstr "Немецкий"
+msgstr ""
 
 #: settings/base.py:61
 msgid "Galician"
-msgstr "Галисийский"
+msgstr ""
 
 #: settings/base.py:62
 msgid "Vietnamese"
-msgstr "Вьетнамский"
+msgstr ""
 
 #: settings/base.py:63
 msgid "Chinese"
-msgstr "Китайский"
+msgstr ""
 
 #: settings/base.py:64
 msgid "Taiwanese"
-msgstr "Тайваньский"
+msgstr ""
 
 #: settings/base.py:65
 msgid "Japanese"
-msgstr "Японский"
+msgstr ""
 
 #: settings/base.py:66
 msgid "Ukrainian"
-msgstr "Украинский"
+msgstr ""
 
 #: templates/404.html:6
 msgid "Maze Found"
-msgstr "Страница не найдена"
+msgstr ""
 
 #: templates/500.html:5
 msgid "Server Error"
-msgstr "Ошибка сервера"
+msgstr ""
 
 #. Translators: Name of the website
 #: templates/base.html:13 templates/error_header.html:12
 #: templates/core/header.html:10 templates/core/home-header.html:9
 msgid "Read the Docs"
-msgstr "Читайте документацию"
+msgstr "اقرأ التعليمات"
 
 #: templates/base.html:61
 msgid ""
 "Your docs are currently being built.  It may take a moment for them to "
 "appear."
-msgstr "Ваша документация находится в процессе сборки. Её появление может занять небольшое время."
+msgstr ""
 
 #: templates/base.html:62
 msgid "Read the Docs thanks you for your continued patience."
-msgstr "Read the Docs благодарит Вас за долготерпение."
+msgstr "اقرأ التعليمات , شكرا لك على صبرك المستمر"
 
 #: templates/base.html:84
 #, python-format
 msgid ""
 "Copyright 2010-2013. Created by %(eric)s, %(charles)s, and %(bobby)s for the"
 " 2010 %(djangodash)s."
-msgstr "Copyright 2010-2013. Авторы: %(eric)s, %(charles)s, и %(bobby)s для 2010 %(djangodash)s."
+msgstr ""
 
 #: templates/base.html:86
 msgid "Docs"
-msgstr "Доки"
+msgstr ""
 
 #: templates/base.html:88
 msgid ""
@@ -768,31 +767,31 @@ msgid ""
 "href=\"https://github.com/rtfd/readthedocs.org/graphs/contributors\">humans</a>."
 " Funded by <a href=\"https://www.gittip.com/readthedocs/\">readers like "
 "you</a>."
-msgstr "Разработано <a href=\"https://github.com/rtfd/readthedocs.org/graphs/contributors\">людьми</a>. Основатели &#x2012 <a href=\"https://www.gittip.com/readthedocs/\">такие же читатели документации, как и Вы</a>."
+msgstr ""
 
 #: templates/base_filter.html:14 templates/core/filter_bar.html:8
 msgid "Filter"
-msgstr "Фильтр"
+msgstr ""
 
 #: templates/error_header.html:22 templates/core/header.html:19
 msgid "Go"
-msgstr "Искать"
+msgstr "أذهب"
 
 #: templates/error_header.html:32 templates/core/header.html:46
 #: templates/registration/logout.html:6
 msgid "Log Out"
-msgstr "Выйти"
+msgstr "تسجيل الخروج"
 
 #: templates/error_header.html:36 templates/core/header.html:48
 #: templates/core/home-header.html:19 templates/registration/login.html:6
 #: templates/registration/login.html:20 templates/registration/login.html:27
 #: templates/registration/password_reset_complete.html:16
 msgid "Log in"
-msgstr "Войти"
+msgstr "تسجيل الدخول"
 
 #: templates/filter.html:26
 msgid "Filtered Results"
-msgstr "Отфильтрованные результаты"
+msgstr ""
 
 #: templates/homepage.html:7
 #: templates/registration/password_reset_complete.html:6
@@ -800,11 +799,11 @@ msgstr "Отфильтрованные результаты"
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_form.html:7
 msgid "Home"
-msgstr "Начало"
+msgstr "الصفحة الرئيسية"
 
 #: templates/homepage.html:44
 msgid "What is this place?"
-msgstr "Где я?"
+msgstr ""
 
 #: templates/homepage.html:46
 msgid ""
@@ -812,213 +811,213 @@ msgid ""
 "You can import your docs using any major version control system, including Mercurial, Git, Subversion, and Bazaar.\n"
 "We support <a href=\"http://read-the-docs.readthedocs.org/en/latest/webhooks.html\">webhooks</a> so your docs get built when you commit code.\n"
 "There's also support for versioning so you can build docs from tags and branches of your code in your repository. A <a href=\"http://read-the-docs.readthedocs.org/en/latest/features.html\">full list of features</a> is available."
-msgstr "Read the Docs служит для размещения документации, делает её доступной для полноценного поиска и позволяет легко найти её заново.\nВы можете импортировать ваши документы с использованием наиболее известных систем контроля версий, включая Mercurial, Git, Subversion и Bazaar.\nМы поддерживаем <a href=\"http://read-the-docs.readthedocs.org/en/latest/webhooks.html\">webhooks</a> , так что ваша документация может быть пересобрана сразу после внесения в репозиторий нового кода.\nТакже, у нас есть поддержка различных версий, поэтому вы можете собирать документацию по меткам или тем веткам, которые у вас есть репозитории. Здесь перечислен <a href=\"http://read-the-docs.readthedocs.org/en/latest/features.html\">полный список возможностей</a>."
+msgstr ""
 
 #: templates/homepage.html:52
 #, python-format
 msgid ""
 "It's free and simple.  Read the <a href=\"%(getting_started_url)s\">Getting "
 "Started</a> guide to get going!"
-msgstr "Это просто и бесплатно.  Чтобы двигаться дальше, читайте руководство: <a href=\"%(getting_started_url)s\">С чего начать?</a>"
+msgstr ""
 
 #: templates/homepage.html:68
 msgid "Featured Projects"
-msgstr "Известные проекты"
+msgstr ""
 
 #: templates/homepage.html:89
 msgid "Recently Updated Projects"
-msgstr "Недавно обновлённые проекты"
+msgstr ""
 
 #: templates/homepage.html:89
 msgid "(All Projects)"
-msgstr "(Все проекты)"
+msgstr ""
 
 #: templates/post_commit.html:5
 msgid "Build Started"
-msgstr "Формирование запущено"
+msgstr ""
 
 #: templates/post_commit.html:10
 #, python-format
 msgid "%(project)s is now building."
-msgstr "Идёт формирование %(project)s."
+msgstr ""
 
 #. Translators: 'it' refers the current project being built.
 #: templates/post_commit.html:12
 #, python-format
 msgid "Check it out <a href=\"%(project_url)s\">over here</a>."
-msgstr "Зацените, что вышло <a href=\"%(project_url)s\">вот здесь</a>."
+msgstr ""
 
 #: templates/post_commit.html:14
 msgid ""
 "This is a post-commit hook. Set it up in your project admin to POST here, "
 "for us to update your doc changes automatically."
-msgstr "Это \"крючок\", англ. hook, который запускается после фиксации изменений - commit. Чтобы ваша документация обновлялась после внесения изменений, установите его в админ-панели вашего проекта и укажите здесь."
+msgstr ""
 
 #: templates/archive/index.html:5
 msgid "Read the Docs Archive"
-msgstr "Архив Read the Docs"
+msgstr ""
 
 #: templates/bookmarks/bookmark_list.html:7
 msgid "Bookmarks"
-msgstr "Закладки"
+msgstr ""
 
 #: templates/bookmarks/bookmark_list.html:20
 msgid "Recent Bookmarks"
-msgstr "Недавние закладки"
+msgstr ""
 
 #: templates/builds/build_detail.html:14
 #, python-format
 msgid "Build for %(project_name)s"
-msgstr "Сборка для %(project_name)s"
+msgstr ""
 
 #: templates/builds/build_detail.html:18
 #, python-format
 msgid "Built: %(build_date)s"
-msgstr "Сформировано: %(build_date)s"
+msgstr ""
 
 #: templates/builds/build_detail.html:20
 msgid "State:"
-msgstr "Состояние:"
+msgstr "الوضعية:"
 
 #: templates/builds/build_detail.html:24
 msgid "Outcome:"
-msgstr "Результат:"
+msgstr ""
 
 #: templates/builds/build_detail.html:27
 msgid "Not yet finished"
-msgstr "Ещё не завершён"
+msgstr ""
 
 #: templates/builds/build_detail.html:27
 #: templates/core/build_list_detailed.html:6
 msgid "Passed"
-msgstr "Успешно,"
+msgstr "تخطى بنجاح"
 
 #: templates/builds/build_detail.html:27
 #: templates/core/build_list_detailed.html:6
 msgid "Failed"
-msgstr "Завершилось неудачей"
+msgstr "فشل"
 
 #: templates/builds/build_detail.html:27
 msgid "Status Code:"
-msgstr "Код завершения:"
+msgstr ""
 
 #: templates/builds/build_detail.html:33
 msgid "Version:"
-msgstr "Версия:"
+msgstr ""
 
 #: templates/builds/build_detail.html:36
 msgid "Type:"
-msgstr "Тип:"
+msgstr "النوع:"
 
 #: templates/builds/build_detail.html:38
 msgid "Sphinx Standard Output"
-msgstr "Результат работы Sphinx"
+msgstr ""
 
 #: templates/builds/build_detail.html:42
 msgid "Sphinx Standard Error"
-msgstr "Ошибки, выведенные в ходе работы Sphinx"
+msgstr ""
 
 #: templates/builds/build_detail.html:47
 msgid "Setup Output"
-msgstr "Вывод команды setup"
+msgstr ""
 
 #: templates/builds/build_detail.html:52
 msgid "Environment Standard Error"
-msgstr "Ошибка, возвращённая через переменную окружения"
+msgstr ""
 
 #: templates/builds/build_list.html:37
 msgid "Build Version:"
-msgstr "Версия сборки:"
+msgstr ""
 
 #: templates/builds/build_list.html:49
 msgid "Recent Builds"
-msgstr "Сформированы недавно"
+msgstr ""
 
 #: templates/builds/tag_list.html:5 templates/projects/tag_list.html:4
 #: templates/projects/tag_list.html.py:7
 msgid "Popular tags"
-msgstr "Популярные тэги"
+msgstr ""
 
 #: templates/core/build_list_detailed.html:8
 #, python-format
 msgid "version %(slug)s (%(type)s)"
-msgstr "версия %(slug)s (%(type)s)"
+msgstr ""
 
 #: templates/core/build_list_detailed.html:8
 #: templates/core/project_list_detailed.html:25
 #, python-format
 msgid "%(date)s ago"
-msgstr "%(date)s назад"
+msgstr ""
 
 #: templates/core/build_list_detailed.html:13
 msgid "No builds found"
-msgstr "Не найдено ни одной сборки"
+msgstr ""
 
 #: templates/core/filter_list.html:12
 msgid "No objects found"
-msgstr "Не найдено ни одного объекта"
+msgstr ""
 
 #: templates/core/header.html:45
 msgid "Dashboard"
-msgstr "Панель инструментов"
+msgstr ""
 
 #: templates/core/home-header.html:10
 msgid "Create, host, and browse documentation."
-msgstr "Создать, сохранить на сайте и просмотреть документацию."
+msgstr ""
 
 #. Translators: Note, the full sentence goes 'Sign up' 'or' 'Log in'. But
 #. unfortunately the three bits have to be separate.
 #: templates/core/home-header.html:17
 msgid "Sign up"
-msgstr "Регистрация"
+msgstr "التسجيل"
 
 #. Translators: The 'or' here is in between 'Submit' and 'delete'.
 #: templates/core/home-header.html:19 templates/projects/project_edit.html:39
 msgid "or"
-msgstr "или"
+msgstr "أو"
 
 #: templates/core/project_bar.html:24
 #, python-format
 msgid "Build failed (<a href=\"%(url)s\">why</a>)"
-msgstr "Закончилось неудачей (<a href=\"%(url)s\">почему</a>)"
+msgstr ""
 
 #: templates/core/project_bar.html:31
 msgid "There are no builds for this project"
-msgstr "Для этого проекта ещё ничего не формировалось"
+msgstr ""
 
 #: templates/core/project_bar.html:31
 msgid "Is the repo correct?"
-msgstr "Верно ли указан репозиторий?"
+msgstr ""
 
 #: templates/core/project_bar.html:35
 msgid "Overview"
-msgstr "Обзор"
+msgstr ""
 
 #: templates/core/project_bar.html:37
 #: templates/core/project_list_detailed.html:30
 #: templates/core/project_list_featured.html:13
 #: templates/projects/project_dashboard.html:70
 msgid "View Docs"
-msgstr "Просмотр"
+msgstr ""
 
 #: templates/core/project_bar.html:40
 #: templates/projects/project_downloads.html:22
 msgid "Downloads"
-msgstr "Скачать"
+msgstr ""
 
 #: templates/core/project_bar.html:43
 msgid "Builds"
-msgstr "Сборки"
+msgstr "البناء"
 
 #: templates/core/project_bar.html:47
 #: templates/projects/project_dashboard.html:68
 msgid "Admin"
-msgstr "Админ"
+msgstr ""
 
 #: templates/core/project_details.html:16
 #, python-format
 msgid "Search %(project)s"
-msgstr "Поиск в %(project)s"
+msgstr ""
 
 #: templates/core/project_details.html:18
 #: templates/core/project_list_detailed.html:34
@@ -1027,99 +1026,99 @@ msgstr "Поиск в %(project)s"
 #: templates/sphinx/sphinx_rtd_theme/layout_old.html:137
 #: templates/sphinx/sphinx_rtd_theme/search.html:11
 msgid "Search"
-msgstr "Поиск"
+msgstr ""
 
 #: templates/core/project_details.html:27
 #: templates/projects/project_edit_base.html:18
 #: templates/projects/project_versions.html:9
 #: templates/projects/upload_html.html:7
 msgid "Versions"
-msgstr "Версии"
+msgstr "الإصدارات"
 
 #: templates/core/project_details.html:49
 #, python-format
 msgid " %(slug)s "
-msgstr " %(slug)s "
+msgstr ""
 
 #: templates/core/project_details.html:56
 #, python-format
 msgid " %(slug)s (Build Failed)"
-msgstr " %(slug)s (сбой в процессе сборки)"
+msgstr ""
 
 #: templates/core/project_details.html:61
 #: templates/profiles/profile_detail.html:37
 #: templates/profiles/profile_detail.html:68
 msgid "Edit"
-msgstr "Править"
+msgstr "تعديل"
 
 #: templates/core/project_details.html:71
 msgid "Build a version"
-msgstr "Запустить сборку версии"
+msgstr ""
 
 #: templates/core/project_details.html:79
 msgid "Build"
-msgstr "Сборка"
+msgstr ""
 
 #: templates/core/project_details.html:89
 msgid "Repository"
-msgstr "Репозиторий"
+msgstr "مستودع"
 
 #: templates/core/project_details.html:94
 msgid "Tags"
-msgstr "Тэги"
+msgstr "أوسمة"
 
 #: templates/core/project_details.html:99
 msgid "No tags"
-msgstr "Нет тэгов"
+msgstr "لا أوسمة"
 
 #: templates/core/project_details.html:104
 msgid "Last Built"
-msgstr "Последняя сборка"
+msgstr "آخر بناء"
 
 #: templates/core/project_details.html:108
 msgid "Home Page"
-msgstr "Домашняя страница"
+msgstr ""
 
 #: templates/core/project_details.html:114
 msgid "Project Privacy Level"
-msgstr "Уровень приватности проекта"
+msgstr ""
 
 #: templates/core/project_details.html:121
 msgid "Short URLs"
-msgstr "Короткие URL-адреса"
+msgstr "العناوين القصيرة"
 
 #: templates/core/project_details.html:130
 msgid "Open Comparison"
-msgstr "Открытое сравнение"
+msgstr "مقارنة مفتوحة"
 
 #: templates/core/project_details.html:131
 #, python-format
 msgid ""
 "This project has more information available about it on <a "
 "href=\"%(url)s\">Open Comparison!</a>"
-msgstr "Есть дополнительная информация об этом проекте по ссылке <a href=\"%(url)s\">Открытое Сравнение!</a>"
+msgstr ""
 
 #: templates/core/project_details.html:135
 #: templates/projects/project_edit_base.html:19
 #: templates/projects/project_translations.html:12
 msgid "Translations"
-msgstr "Переводы"
+msgstr ""
 
 #: templates/core/project_details.html:144
 msgid "Sub Projects"
-msgstr "Подпроекты"
+msgstr ""
 
 #: templates/core/project_details.html:155
 msgid "'latest' Version"
-msgstr "'последняя' версия"
+msgstr ""
 
 #: templates/core/project_details.html:159
 msgid "Post Commit Hook"
-msgstr "\"Крючок\" после фиксации изменений"
+msgstr ""
 
 #: templates/core/project_details.html:172
 msgid "Most viewed pages for this project"
-msgstr "Наиболее часто просматриваемые страницы этого проекта"
+msgstr ""
 
 #: templates/core/project_downloads.html:6
 #, python-format
@@ -1127,7 +1126,7 @@ msgid ""
 "\n"
 "        %(version)s PDF\n"
 "      "
-msgstr "\n        %(version)s PDF\n      "
+msgstr ""
 
 #: templates/core/project_downloads.html:16
 #, python-format
@@ -1135,7 +1134,7 @@ msgid ""
 "\n"
 "        %(version)s HTMLZip\n"
 "      "
-msgstr "\n        %(version)s HTMLZip\n      "
+msgstr ""
 
 #: templates/core/project_downloads.html:26
 #, python-format
@@ -1143,7 +1142,7 @@ msgid ""
 "\n"
 "        %(version)s Epub\n"
 "      "
-msgstr "\n        %(version)s Epub\n      "
+msgstr ""
 
 #: templates/core/project_downloads.html:49
 #, python-format
@@ -1151,7 +1150,7 @@ msgid ""
 "\n"
 "        %(version)s Dash docset\n"
 "      "
-msgstr "\n        %(version)s Dash docset\n      "
+msgstr ""
 
 #: templates/core/project_downloads.html:59
 #, python-format
@@ -1159,283 +1158,283 @@ msgid ""
 "\n"
 "        %(version)s Dash feed\n"
 "      "
-msgstr "\n        %(version)s ссылка для Dash\n      "
+msgstr ""
 
 #: templates/core/project_downloads.html:67
 msgid "No downloads for this project."
-msgstr "Для этого проекта скачивать нечего."
+msgstr ""
 
 #: templates/core/project_list_detailed.html:42
 #: templates/core/project_list_featured.html:25
 msgid "No Docs"
-msgstr "Пусто"
+msgstr "لا ملفات تعليمات"
 
 #: templates/core/project_list_detailed.html:49
 #: templates/core/project_list_featured.html:32
 msgid "No projects found"
-msgstr "Не найдено ни одного проекта"
+msgstr ""
 
 #: templates/core/version_list.html:12
 msgid "Add tags"
-msgstr "Добавить тэги"
+msgstr ""
 
 #: templates/core/widesearchbar.html:4
 msgid "Search all the docs."
-msgstr "Поиск по всей документации"
+msgstr "البحث في جميع التعليمات"
 
 #. Translators: This is about starting a search
 #: templates/core/widesearchbar.html:16
 msgid "Let's do this."
-msgstr "Начать поиск."
+msgstr "لنعمل على هذا"
 
 #: templates/dashboard/dashboard_bar.html:8
 #: templates/projects/project_list.html:17
 #: templates/projects/project_list.html:35
 msgid "Projects"
-msgstr "Проекты"
+msgstr "مشاريع"
 
 #: templates/dashboard/dashboard_bar.html:16
 msgid "Import"
-msgstr "Импортировать"
+msgstr "إستيراد"
 
 #: templates/dashboard/dashboard_bar.html:22
 msgid "Profile"
-msgstr "Мой профиль"
+msgstr ""
 
 #: templates/dashboard/dashboard_bar.html:26
 msgid "Create Profile"
-msgstr "Создать профиль"
+msgstr "إنشاء ملف تعريف"
 
 #: templates/dashboard/dashboard_bar.html:30
 msgid "Change Password"
-msgstr "Сменить пароль"
+msgstr "تغير كلمة المرور"
 
 #: templates/djangome/choices.html:4
 #, python-format
 msgid "Choose a redirect for \"%(djangome_term)s\""
-msgstr "Выберите редирект для \"%(djangome_term)s\""
+msgstr ""
 
 #: templates/djangome/choices.html:7
 #, python-format
 msgid ""
 "Choose a redirect for <kbd>%(djangome_term)s on <a "
 "href=\"http://%(slug)s.readthedocs.org\">%(slug)s.readthedocs.org</a></kbd>"
-msgstr "Выберите редирект для <kbd>%(djangome_term)s на <a href=\"http://%(slug)s.readthedocs.org\">%(slug)s.readthedocs.org</a></kbd>"
+msgstr ""
 
 #: templates/djangome/choices.html:28
 msgid "Save &amp; go &rarr;"
-msgstr "Сохранить &amp; запустить &rarr;"
+msgstr "حفظ &amp; المتابعة &rarr;"
 
 #: templates/djangome/oneoffs.html:4
 msgid "One-offs"
-msgstr "Единожды"
+msgstr ""
 
 #: templates/djangome/oneoffs.html:12
 msgid "Term"
-msgstr "Термин"
+msgstr ""
 
 #: templates/djangome/oneoffs.html:13
 msgid "Target"
-msgstr "Цель"
+msgstr "الهدف"
 
 #: templates/djangome/oneoffs.html:27
 msgid "kill"
-msgstr "убить"
+msgstr "قتل"
 
 #: templates/djangome/oneoffs.html:37
 msgid "add"
-msgstr "добавить"
+msgstr "أضف"
 
 #: templates/djangome/show.html:4
 #, python-format
 msgid "Statistics for %(term)s"
-msgstr "Статистика для %(term)s"
+msgstr ""
 
 #: templates/djangome/show.html:5
 #, python-format
 msgid "Statistics for <kbd>%(term)s</kbd>:"
-msgstr "Статистика для <kbd>%(term)s</kbd>:"
+msgstr ""
 
 #: templates/djangome/show.html:13
 msgid "Clicks"
-msgstr "Клики"
+msgstr "نقرات"
 
 #: templates/djangome/show.html:39
 msgid "Add"
-msgstr "Добавить"
+msgstr "أضف"
 
 #: templates/flagging/flag_confirm.html:6
 #: templates/flagging/flag_confirm.html:11
 msgid "Confirm flagging"
-msgstr "Подтвердить пометку флагом"
+msgstr ""
 
 #: templates/flagging/flag_confirm.html:17
 msgid "What you are saying:"
-msgstr "То, что вы говорите:"
+msgstr "الذي تقوله:"
 
 #: templates/flagging/flag_confirm.html:21
 #, python-format
 msgid "Are you sure you want to flag \"%(object)s\" as \"%(flag_type.title)s\"?"
-msgstr "Вы уверены, что хотите пометить \"%(object)s\" флагом \"%(flag_type.title)s\"?"
+msgstr ""
 
 #: templates/flagging/flag_confirm.html:23
 #, python-format
 msgid "Yes, this is %(title)s"
-msgstr "Да, это %(title)s"
+msgstr ""
 
 #: templates/flagging/flag_confirm.html:24
 msgid "cancel"
-msgstr "отмена"
+msgstr "إلغاء"
 
 #: templates/flagging/flag_success.html:6
 #: templates/flagging/flag_success.html:11
 msgid "Flagging successful"
-msgstr "Успешно помечено флагом"
+msgstr ""
 
 #: templates/flagging/flag_success.html:16
 #, python-format
 msgid "You have successfully flagged \"%(object)s\" as \"%(flag_type.title)s\""
-msgstr "Вы успешно пометили \"%(object)s\" флагом \"%(flag_type.title)s\""
+msgstr ""
 
 #: templates/flagging/flag_success.html:18
 msgid "Thank you for contributing to the quality of this site!"
-msgstr "Спасибо за ваш вклад в наше общее дело!"
+msgstr "شكرا لك على المساهمة في جودة هذا الموقع!"
 
 #: templates/pagination/pagination.html:6
 #: templates/pagination/pagination.html:8
 msgid "previous"
-msgstr "назад"
+msgstr "السابق"
 
 #: templates/pagination/pagination.html:22
 #: templates/pagination/pagination.html:24
 msgid "next"
-msgstr "вперёд"
+msgstr "التالي"
 
 #: templates/profiles/create_profile.html:5
 #: templates/profiles/create_profile.html:10
 msgid "Create your profile"
-msgstr "Создать ваш профиль"
+msgstr "إنشاء ملفك الشخصي"
 
 #: templates/profiles/create_profile.html:16
 msgid "Create it!"
-msgstr "Создать его!"
+msgstr "أنشئ ذلك!"
 
 #: templates/profiles/edit_profile.html:5
 #: templates/profiles/edit_profile.html:15
 msgid "Edit your profile"
-msgstr "Править профиль"
+msgstr "تعديل ملفك الشخصي"
 
 #: templates/profiles/edit_profile.html:21
 msgid "OK, save it!"
-msgstr "OK, сохранить!"
+msgstr "حسنا, أحفظه!"
 
 #: templates/profiles/profile_detail.html:6
 #, python-format
 msgid "%(user)s's profile"
-msgstr "Профиль %(user)s"
+msgstr ""
 
 #: templates/profiles/profile_detail.html:44
 msgid "Add Your Name"
-msgstr "Добавить Ваше имя"
+msgstr ""
 
 #: templates/profiles/profile_detail.html:76
 msgid "Add a Homepage"
-msgstr "Добавить домашнюю страницу"
+msgstr ""
 
 #: templates/profiles/profile_detail.html:85
 msgid "Press enter to save your changes, or escape to discard them"
-msgstr "Нажмите Enter, чтобы сохранить ваши изменения, либо Esc, чтобы отказаться от них"
+msgstr ""
 
 #: templates/profiles/profile_list.html:5
 #: templates/profiles/profile_list.html:8
 msgid "User profiles"
-msgstr "Профили пользователей"
+msgstr "الملفات الشخصية للمستخدمين"
 
 #: templates/projects/alias_edit.html:4 templates/projects/alias_edit.html:7
 msgid "Project Alias"
-msgstr "Другое название проекта"
+msgstr "كنية المشروع"
 
 #: templates/projects/alias_edit.html:12
 msgid "Add an alias for a project version."
-msgstr "Добавить для версии проекта другое название."
+msgstr "أضف كنية لإصدار المشروع"
 
 #: templates/projects/alias_edit.html:16
 #: templates/projects/project_create.html:42
 #: templates/projects/project_import.html:32
 #: templates/projects/project_import.html:38
 msgid "Create"
-msgstr "Создать"
+msgstr "إنشاء"
 
 #: templates/projects/alias_list.html:6 templates/projects/alias_list.html:11
 msgid "Aliases"
-msgstr "Другие названия"
+msgstr "أسماء كنية"
 
 #: templates/projects/alias_list.html:20
 #: templates/projects/project_list.html:48
 msgid "Browse projects"
-msgstr "Просмотреть пректы"
+msgstr "تصفّح المشاريع"
 
 #: templates/projects/legend.html:4
 msgid "External Links"
-msgstr "Внешние сслыки"
+msgstr "روابط خارجية"
 
 #: templates/projects/legend.html:5
 msgid "Link text"
-msgstr "Текст ссылки"
+msgstr "نص الرابط"
 
 #: templates/projects/legend.html:7
 msgid "Internal Links"
-msgstr "Внутренние ссылки"
+msgstr "روابط داخلية"
 
 #: templates/projects/legend.html:10
 msgid "Bold"
-msgstr "Полужирный"
+msgstr ""
 
 #: templates/projects/legend.html:11
 msgid "text to bold"
-msgstr "полужирный текст"
+msgstr ""
 
 #: templates/projects/legend.html:13
 msgid "Emphasized"
-msgstr "Подчёркнуто"
+msgstr ""
 
 #: templates/projects/legend.html:14
 msgid "text to emphasize"
-msgstr "текст для выделения подчёркиванием"
+msgstr ""
 
 #: templates/projects/legend.html:16
 msgid "Lists"
-msgstr "Списки"
+msgstr ""
 
 #: templates/projects/legend.html:19 templates/projects/legend.html.py:20
 #: templates/projects/legend.html:23 templates/projects/legend.html.py:24
 msgid "Item"
-msgstr "пункт"
+msgstr ""
 
 #: templates/projects/legend.html:28
 msgid "Source Code"
-msgstr "Исходный текст"
+msgstr ""
 
 #: templates/projects/legend.html:30
 msgid "e.g. Check out this code"
-msgstr "напр. Зацените этот код"
+msgstr ""
 
 #: templates/projects/legend.html:31
 msgid "actual code indented"
-msgstr "текущий код с отступом"
+msgstr ""
 
 #: templates/projects/legend.html:34
 msgid "reStructuredText Primer"
-msgstr "Пример reStructuredText"
+msgstr ""
 
 #: templates/projects/project_advanced.html:23
 msgid "Edit Advanced Project Settings"
-msgstr "Редактировать расширенные настройки проекта"
+msgstr ""
 
 #: templates/projects/project_advanced.html:28
 #: templates/projects/project_edit_base.html:16
 msgid "Advanced Settings"
-msgstr "Расширенные настройки"
+msgstr ""
 
 #: templates/projects/project_advanced.html:34
 #: templates/projects/project_edit.html:37
@@ -1445,329 +1444,329 @@ msgstr "Расширенные настройки"
 #: templates/projects/project_users.html:51
 #: templates/projects/project_versions.html:53
 msgid "Submit"
-msgstr "Отправить"
+msgstr "أرسل"
 
 #: templates/projects/project_create.html:29
 msgid "Create a new project"
-msgstr "Создать новый проект"
+msgstr ""
 
 #: templates/projects/project_create.html:32
 msgid "Create a New Project"
-msgstr "Создать новый проект"
+msgstr ""
 
 #: templates/projects/project_create.html:37
 msgid ""
 "Create new documentation here. If you already have docs in a public "
 "repository,"
-msgstr "Если у вас уже есть документация в общедоступном репозитории, создайте её и здесь."
+msgstr ""
 
 #: templates/projects/project_create.html:38
 msgid "import an existing project"
-msgstr "импортировать существующий проект"
+msgstr ""
 
 #: templates/projects/project_dashboard.html:5
 msgid "Project Dashboard"
-msgstr "Панель управления проекта"
+msgstr ""
 
 #: templates/projects/project_dashboard.html:29
 msgid "Important Versions"
-msgstr "Важные версии"
+msgstr ""
 
 #: templates/projects/project_dashboard.html:57
 msgid "My Projects"
-msgstr "Мои проекты"
+msgstr ""
 
 #: templates/projects/project_dashboard.html:83
 #, python-format
 msgid ""
 "You don't have any projects.  You should <a href=\"%(projects_import_url)s\">create new docs</a> on the site.<br>\n"
 "          Check out the <a href=\"%(getting_started_url)s\">Getting Started</a> documentation for information about how to get going."
-msgstr "У вас нет ни одного проекта.  Для размещения новой документации на сайте вам следует <a href=\"%(projects_import_url)s\">создать её</a>.<br>\n          Для того, чтобы узнать, как двинуться дальше, обратитесь к разделу документации: <a href=\"%(getting_started_url)s\">с чего начать?</a>."
+msgstr ""
 
 #: templates/projects/project_delete.html:4
 #: templates/projects/project_delete.html:6
 #, python-format
 msgid "Delete %(name)s?"
-msgstr "Удалить %(name)s?"
+msgstr ""
 
 #: templates/projects/project_delete.html:9
 msgid "You sure?"
-msgstr "Вы уверены?"
+msgstr "هل أنت متأكد؟"
 
 #: templates/projects/project_delete.html:12
 msgid "Delete forever"
-msgstr "Удалить навсегда"
+msgstr ""
 
 #: templates/projects/project_edit.html:23
 msgid "Edit Project"
-msgstr "Редактировать проект"
+msgstr ""
 
 #: templates/projects/project_edit.html:28
 #: templates/projects/project_edit_base.html:15
 msgid "Settings"
-msgstr "Настройки"
+msgstr ""
 
 #: templates/projects/project_edit.html:40
 msgid "delete"
-msgstr "удалить"
+msgstr ""
 
 #: templates/projects/project_edit_base.html:17
 #: templates/projects/project_users.html:8
 msgid "Maintainers"
-msgstr "Кураторы"
+msgstr ""
 
 #: templates/projects/project_edit_base.html:20
 #: templates/projects/project_subprojects.html:12
 msgid "Subprojects"
-msgstr "Подпроекты"
+msgstr "مشاريع فرعية"
 
 #: templates/projects/project_edit_base.html:21
 #: templates/projects/project_notifications.html:12
 msgid "Notifications"
-msgstr "Уведомления"
+msgstr ""
 
 #: templates/projects/project_import.html:4
 #: templates/projects/project_import.html:28
 msgid "Import an existing project"
-msgstr "Импортировать существующий проект"
+msgstr ""
 
 #: templates/projects/project_list.html:9
 #: templates/projects/project_list.html:27
 #, python-format
 msgid "Projects by %(username)s tagged with %(tag)s"
-msgstr "Проект автора %(username)s с тэгами %(tag)s"
+msgstr ""
 
 #: templates/projects/project_list.html:11
 #: templates/projects/project_list.html:29
 #, python-format
 msgid "Projects by %(username)s"
-msgstr "Проект автора %(username)s"
+msgstr ""
 
 #: templates/projects/project_list.html:15
 #: templates/projects/project_list.html:33
 #, python-format
 msgid "Projects tagged with %(tag)s"
-msgstr "Проект помечен тэгом %(tag)s"
+msgstr ""
 
 #: templates/projects/project_notifications.html:5
 msgid "Edit Notifications"
-msgstr "Редактировать уведомления"
+msgstr ""
 
 #: templates/projects/project_notifications.html:16
 msgid "Configure Notifications to be sent on build failures."
-msgstr "Настроить уведомления при сбоях в процессе сборки."
+msgstr ""
 
 #: templates/projects/project_notifications.html:19
 msgid "Existing Notifications"
-msgstr "Существующие уведомления"
+msgstr ""
 
 #: templates/projects/project_notifications.html:30
 msgid "Remove Notifications"
-msgstr "Удалить уведомления"
+msgstr ""
 
 #: templates/projects/project_notifications.html:39
 #: templates/projects/project_subprojects.html:27
 #: templates/projects/project_translations.html:26
 msgid "Remove"
-msgstr "Удалить"
+msgstr ""
 
 #: templates/projects/project_notifications.html:45
 msgid "New Notifications"
-msgstr "Новые уведомления"
+msgstr ""
 
 #: templates/projects/project_notifications.html:47
 msgid "Add an email address to notify"
-msgstr "Добавить адрес e-mail для получения уведомлений"
+msgstr ""
 
 #: templates/projects/project_subprojects.html:5
 msgid "Edit Subprojects"
-msgstr "Редактировать подпроекты"
+msgstr ""
 
 #: templates/projects/project_subprojects.html:16
 msgid ""
 "This allows you to add subprojects to your project. This allows them to live"
 " in the same namespace in the URLConf for a subdomain or CNAME."
-msgstr "Здесь можно добавить к вашему проекту подпроекты. Это позволит им находиться в том же пространстве имён в URLConf для поддомена или CNAME."
+msgstr ""
 
 #: templates/projects/project_subprojects.html:19
 msgid "Existing Subprojects"
-msgstr "Существующие подпроекты"
+msgstr ""
 
 #: templates/projects/project_subprojects.html:32
 msgid "Choose which project you would like to add as a subproject."
-msgstr "Выберите, какой проект вы хотите добавить в качестве подпроекта."
+msgstr ""
 
 #: templates/projects/project_translations.html:5
 msgid "Edit Translations"
-msgstr "Редактировать переводы"
+msgstr ""
 
 #: templates/projects/project_translations.html:16
 msgid ""
 "This allows you to add translations to your project. Select the project "
 "below that is a translation of your current project."
-msgstr "Здесь можно добавить к вашему проекту переводы. Выберите, какой из нижеперечисленных проектов является переводом вашего проекта."
+msgstr ""
 
 #: templates/projects/project_translations.html:19
 msgid "Existing Translations"
-msgstr "Существующие переводы"
+msgstr ""
 
 #: templates/projects/project_translations.html:31
 msgid "Choose which project you would like to add as a translation."
-msgstr "Выберите, который из проектов вы хотите добавить в качестве перевода."
+msgstr ""
 
 #: templates/projects/project_users.html:5
 msgid "Edit Maintainers"
-msgstr "Редактировать кураторов"
+msgstr ""
 
 #: templates/projects/project_users.html:12
 msgid ""
 "This allows you to add maintainers to your project. It gives them admin "
 "access to the project, so be careful!"
-msgstr "Здесь вы можете назначить вашему проекту кураторов. Это даст им административный доступ к проекту, поэтому будьте осмотрительны!"
+msgstr ""
 
 #: templates/projects/project_users.html:15
 msgid "Existing Maintainers"
-msgstr "Существующие кураторы"
+msgstr ""
 
 #: templates/projects/project_users.html:28
 msgid "Remove Maintainer"
-msgstr "Удалить куратора"
+msgstr ""
 
 #: templates/projects/project_users.html:44
 msgid "Add Maintainer"
-msgstr "Добавить куратора"
+msgstr ""
 
 #: templates/projects/project_users.html:46
 msgid "Choose which user you would like to add."
-msgstr "Выберите, которого пользователя вы хотите добавить."
+msgstr ""
 
 #: templates/projects/project_version_detail.html:14
 #, python-format
 msgid "%(version_name)s"
-msgstr "%(version_name)s"
+msgstr ""
 
 #: templates/projects/project_versions.html:4
 msgid "Edit Project Versions"
-msgstr "Редактировать версии проекта"
+msgstr ""
 
 #: templates/projects/project_versions.html:21
 msgid "Choose the version that / will redirect to."
-msgstr "Выберите версию, которой будет соответствовать начальная страница /."
+msgstr ""
 
 #: templates/projects/project_versions.html:27
 msgid "Choose Active Versions"
-msgstr "Выберите активные версии"
+msgstr ""
 
 #: templates/projects/project_versions.html:29
 msgid "Active versions below will show up on the site."
-msgstr "На сайте будут показаны нижеуказанные активные версии."
+msgstr ""
 
 #: templates/projects/search.html:6 templates/projects/search.html.py:20
 #, python-format
 msgid "Search results for %(term)s"
-msgstr "Искать результаты для %(term)s"
+msgstr ""
 
 #: templates/projects/search.html:37
 msgid "Huh?"
-msgstr "Что?"
+msgstr ""
 
 #: templates/projects/search.html:38
 msgid "No docs matched your search. ¯\\(O_o)/¯"
-msgstr "Документации соответствующей поиску не найдено. ¯\\(O_o)/¯"
+msgstr ""
 
 #: templates/projects/upload_html.html:4
 msgid "Import HTML Documentation"
-msgstr "Импорт HTML-документации"
+msgstr ""
 
 #: templates/projects/upload_html.html:7
 msgid "Upload HTML"
-msgstr "Загрузить на сервер HTML"
+msgstr ""
 
 #: templates/projects/upload_html.html:11
 msgid ""
 "Use this to upload pre-existing HTML documentation for versions that don't "
 "build correctly anymore."
-msgstr "Используйте эту возможность для загрузки на сервер уже существующей HTML-документации для тех версий, которые больше уже никогда не будут собраны."
+msgstr ""
 
 #: templates/projects/upload_html.html:15
 msgid "Upload"
-msgstr "Загрузить"
+msgstr ""
 
 #. Translators: After 'Flag this project as' follows either 'Inappropriate',
 #. 'Spam' and/or 'Duplicate'
 #: templates/projects/includes/flagging.html:7
 msgid "Flag this project as"
-msgstr "Пометить этот проект как"
+msgstr ""
 
 #: templates/projects/includes/flagging.html:8
 msgid "Inappropriate"
-msgstr "Неподходящий"
+msgstr ""
 
 #: templates/projects/includes/flagging.html:9
 msgid "Spam"
-msgstr "Спам"
+msgstr ""
 
 #: templates/projects/includes/flagging.html:10
 msgid "Duplicate"
-msgstr "Дубликат"
+msgstr ""
 
 #: templates/projects/includes/icon_built.html:9
 msgid "Not built"
-msgstr "Не сформировано"
+msgstr ""
 
 #: templates/projects/samples/getting_started.rst.html:3
 msgid "Here's a place to describe how to get up and running with your project"
-msgstr "Здесь можно описать, как поднять и запустить ваш проект"
+msgstr ""
 
 #: templates/projects/samples/installation.rst.html:3
 #, python-format
 msgid "Here is where you can describe how to install %(name)s"
-msgstr "Здесь вы можете описать процесс инсталляции %(name)s"
+msgstr ""
 
 #: templates/registration/activate.html:6
 #: templates/registration/activate.html:11
 msgid "Account activation error"
-msgstr "Ошибка активации учётной записи"
+msgstr ""
 
 #: templates/registration/activate.html:17
 #, python-format
 msgid ""
 "The activation key \"%(activation_key)s\" is invalid and cannot be used to "
 "activate this account."
-msgstr "Ключ активации \"%(activation_key)s\" недействителен и не может быть использован для активации этой учётной записи."
+msgstr ""
 
 #: templates/registration/activate.html:18
 #, python-format
 msgid ""
 "Did you really think activation key \"%(activation_key)s\" was going to "
 "work?!"
-msgstr "Вы на самом деле думаете, что ключ активации \"%(activation_key)s\" пригоден?!"
+msgstr ""
 
 #: templates/registration/activate.html:21
 msgid ""
 "We're not sure how you got that key, but would you mind registering again"
-msgstr "Нам сложно понять, откуда у вас этот ключ, будьте так любезны пройти регистрацию заново."
+msgstr ""
 
 #: templates/registration/activate.html:21
 #: templates/registration/activation_complete.html:17
 msgid "here"
-msgstr "здесь"
+msgstr ""
 
 #: templates/registration/activation_complete.html:6
 msgid "Account activation complete"
-msgstr "Активация учётной записи выполнена."
+msgstr ""
 
 #: templates/registration/activation_complete.html:11
 msgid "Account activation complete, woo!"
-msgstr "Активация учётной записи выполнена, так-то!"
+msgstr ""
 
 #: templates/registration/activation_complete.html:16
 msgid "Your account has been activated."
-msgstr "Ваша учётная запись теперь активна."
+msgstr ""
 
 #: templates/registration/activation_complete.html:17
 msgid "Log in with the username and password you just created,"
-msgstr "Войдите под именем пользователя и паролем, которые только что создали."
+msgstr ""
 
 #: templates/registration/activation_email.txt:1
 #, python-format
@@ -1780,91 +1779,94 @@ msgid ""
 "This page will expire in %(expiration_days)s days.\n"
 "\n"
 "If you didn't register this account you can simply delete this email and we won't bother you again."
-msgstr "Спасибо, что зарегистрировались на %(domain)s.\nДля активации вашей регистрации проследуйте пожалуйста по следующей ссылке:\n\nhttp://%(domain)s%(activation_url)s\n\nСсылка устареет через %(expiration_days)s дней.\n\nЕсли вы не создавали никаких учётных записей, то можете просто удалить это письмо и мы вас больше не побеспокоим."
+msgstr ""
 
 #: templates/registration/activation_email_subject.txt:1
 #, python-format
 msgid "%(site_name)s - activate your account"
-msgstr "%(site_name)s - активируйте вашу учётную запись"
+msgstr ""
 
 #: templates/registration/base_registration.html:5
 msgid "Registration"
-msgstr "Регистрация"
+msgstr ""
 
 #: templates/registration/base_registration.html:6
 msgid "registration"
-msgstr "регистрация"
+msgstr ""
 
 #: templates/registration/login.html:30
 msgid ""
 "If you forgot your password, <a href=\"/accounts/password/reset/\">reset "
 "it.</a>"
-msgstr "Если вы забыли свой пароль, <a href=\"/accounts/password/reset/\">сбросьте его.</a>"
+msgstr ""
 
 #: templates/registration/login.html:33
 msgid ""
 "Don't have an account?  <a href=\"/accounts/register/\">Register</a> a new "
 "one."
-msgstr "Нет учётной записи? <a href=\"/accounts/register/\">Создайте</a> новую."
+msgstr ""
 
 #: templates/registration/logout.html:11
 msgid "You've logged out."
-msgstr "Вы вышли."
+msgstr ""
 
 #: templates/registration/logout.html:17
 msgid "Thanks for visiting!"
-msgstr "Рады видеть вас!"
+msgstr ""
 
 #: templates/registration/logout.html:21
 #, python-format
 msgid ""
 "If you are looking to log in again, you can do that <a "
 "href=\"%(login_url)s\">here</a>"
-msgstr "Если вам будет необходимо войти ещё раз, перейдите сюда <a href=\"%(login_url)s\">here</a>"
+msgstr ""
 
 #: templates/registration/password_change_done.html:4
 #: templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "Смена пароля прошла успешно"
+msgstr ""
 
 #: templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "Ваш пароль был сменён."
+msgstr ""
 
 #: templates/registration/password_change_form.html:4
 #: templates/registration/password_change_form.html:24
 msgid "Password change"
-msgstr "Смена пароля"
+msgstr ""
 
 #: templates/registration/password_change_form.html:20
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] "Пожалуйста, исправьте ниже ошибку."
-msgstr[1] "Пожалуйста, исправьте ниже ошибки."
-msgstr[2] "Пожалуйста, исправьте ниже ошибки."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new"
 " password twice so we can verify you typed it in correctly."
-msgstr "В целях безопасности введите, пожалуйста, старый пароль, а затем новый дважды, чтобы избежать опечаток."
+msgstr ""
 
 #: templates/registration/password_change_form.html:30
 msgid "Old password"
-msgstr "Старый пароль"
+msgstr ""
 
 #: templates/registration/password_change_form.html:35
 msgid "New password"
-msgstr "Новый пароль"
+msgstr ""
 
 #: templates/registration/password_change_form.html:40
 msgid "Password (again)"
-msgstr "Пароль (ещё раз)"
+msgstr ""
 
 #: templates/registration/password_change_form.html:44
 #: templates/registration/password_reset_confirm.html:23
 msgid "Change my password"
-msgstr "Сменить мой пароль"
+msgstr ""
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_confirm.html:8
@@ -1873,254 +1875,254 @@ msgstr "Сменить мой пароль"
 #: templates/registration/password_reset_form.html:9
 #: templates/registration/password_reset_form.html:13
 msgid "Password reset"
-msgstr "Сброс пароля"
+msgstr ""
 
 #: templates/registration/password_reset_complete.html:8
 #: templates/registration/password_reset_complete.html:12
 msgid "Password reset complete"
-msgstr "Сброс пароля прошёл успешно"
+msgstr ""
 
 #: templates/registration/password_reset_complete.html:14
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Ваш пароль установлен. Теперь можно войти заново."
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:6
 msgid "Password reset confirmation"
-msgstr "Подтверждение сброса пароля"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:14
 msgid "Enter new password"
-msgstr "Введите новый пароль"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:16
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "Пожалуйста, введите ваш новый пароль дважды - чтобы избежать в нём опечаток."
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:20
 msgid "New password:"
-msgstr "Новый пароль:"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:22
 msgid "Confirm password:"
-msgstr "Пароль ещё раз:"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:28
 msgid "Password reset unsuccessful"
-msgstr "Неудачный сброс пароля"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:30
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr "Неверная ссылка для сброса пароля, возможно из-за её повторного использования. Пожалуйста, запросите новый сброс пароля."
+msgstr ""
 
 #: templates/registration/password_reset_done.html:8
 #: templates/registration/password_reset_done.html:12
 msgid "Password reset successful"
-msgstr "Пароль успешно сброшен"
+msgstr ""
 
 #: templates/registration/password_reset_done.html:14
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr "Мы выслали по e-mail на указанный вами адрес инструкции о том, как задать новый пароль. Вскоре вы их получите."
+msgstr ""
 
 #: templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Вы получили это письмо, так как запросили сброс пароля"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:3
 #, python-format
 msgid "for your user account at %(site_name)s"
-msgstr "для вашей учётной записи на %(site_name)s"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr "Пожалуйста, перейдите по ссылке и введите там ваш новый пароль:"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
-msgstr "Если вы забыли, вот ваше имя пользователя:"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr "Спасибо, что используете наш сайт!"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:13
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "Команда %(site_name)s"
+msgstr ""
 
 #: templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr "Забыли пароль? Введите ниже ваш e-mail адрес, и мы вышлем на него инструкции, как задать новый пароль."
+msgstr ""
 
 #: templates/registration/password_reset_form.html:19
 msgid "E-mail address:"
-msgstr "Адрес e-mail:"
+msgstr ""
 
 #: templates/registration/password_reset_form.html:19
 msgid "Reset my password"
-msgstr "Сбросить мой пароль"
+msgstr ""
 
 #: templates/registration/registration_closed.html:6
 msgid "Registration closed"
-msgstr "Регистрация закрыта"
+msgstr ""
 
 #: templates/registration/registration_closed.html:11
 msgid "Eh... Registration closed."
-msgstr "Эх... Регистрация закрыта."
+msgstr ""
 
 #: templates/registration/registration_closed.html:17
 msgid ""
 " You registered a long time ago.\n"
 "    We aren't sure if you are a robot or if \n"
 "    something got lost or what."
-msgstr " Вы регистрировались очень давно.\n    Мы подозреваем, что вы робот, а может \n    что-то пропало и т. п."
+msgstr ""
 
 #: templates/registration/registration_closed.html:20
 msgid "Please try"
-msgstr "Попробуйте, пожалуйста"
+msgstr ""
 
 #: templates/registration/registration_closed.html:20
 msgid "registering again"
-msgstr "зарегистрироваться заново"
+msgstr ""
 
 #: templates/registration/registration_closed.html:23
 msgid "We hope that isn't too inconvenient."
-msgstr "Мы надеемся, это не доставит много хлопот."
+msgstr ""
 
 #: templates/registration/registration_complete.html:6
 #: templates/registration/registration_complete.html:11
 msgid "Registration complete"
-msgstr "Регистрация завершена."
+msgstr ""
 
 #: templates/registration/registration_complete.html:16
 msgid "Now activate your account."
-msgstr "Теперь вам необходимо активировать учётную запись."
+msgstr ""
 
 #: templates/registration/registration_complete.html:18
 msgid ""
 "We will be sending you an email with an activation link.\n"
 "    Visit the link to verify this account."
-msgstr "Мы вышлем вам e-mail со ссылкой для активации.\n    Перейдите по этой ссылке для подтверждения учётной записи."
+msgstr ""
 
 #: templates/registration/registration_complete.html:22
 msgid "Check your email.  We'll wait."
-msgstr "Проверьте вашу почту. Мы подождём."
+msgstr ""
 
 #: templates/registration/registration_form.html:6
 #: templates/registration/registration_form.html:20
 msgid "Register for an account"
-msgstr "Зарегистрировать учётную запись"
+msgstr ""
 
 #: templates/registration/registration_form.html:27
 msgid "Send me the activation link."
-msgstr "Выслать ссылку для активации."
+msgstr ""
 
 #: templates/search/base_facet.html:5 templates/search/search.html:5
 #, python-format
 msgid "Search: %(query)s"
-msgstr "Поиск: %(query)s"
+msgstr ""
 
 #. Translators: This is about starting a search
 #: templates/search/base_facet.html:27 templates/search/search.html:17
 msgid "Go crazy."
-msgstr "С ума сойти."
+msgstr ""
 
 #: templates/search/base_search.html:9
 #: templates/search/faceted_results.html:49
 msgid "Project:"
-msgstr "Проект:"
+msgstr ""
 
 #: templates/search/base_search.html:14
 msgid "File:"
-msgstr "Файл:"
+msgstr ""
 
 #: templates/search/base_search.html:24
 #: templates/search/faceted_results.html:63
 msgid "No results found. Bummer."
-msgstr "Облом. Ничего не найдено."
+msgstr ""
 
 #: templates/search/faceted_author.html:8
 msgid "By Author"
-msgstr "По автору"
+msgstr ""
 
 #: templates/search/faceted_author.html:13
 msgid "Author"
-msgstr "Автор"
+msgstr ""
 
 #: templates/search/faceted_author.html:21
 msgid "No author facets."
-msgstr "Нет деталей об авторе."
+msgstr ""
 
 #: templates/search/faceted_results.html:7
 #, python-format
 msgid "%(count)s Results for %(query)s"
-msgstr "%(count)s результатов для %(query)s"
+msgstr ""
 
 #: templates/search/faceted_results.html:7
 msgid "No search term entered"
-msgstr "Не введена строка для поиска"
+msgstr ""
 
 #. Translators: The refers to filtering a search by using facets
 #: templates/search/faceted_results.html:15
 msgid "Filtered by"
-msgstr "Отфильтровано по"
+msgstr ""
 
 #: templates/search/faceted_results.html:18
 msgid "remove"
-msgstr "удалить"
+msgstr ""
 
 #: templates/search/faceted_results.html:21
 msgid "Filter by Project"
-msgstr "Фильтровать по проекту"
+msgstr ""
 
 #: templates/search/faceted_results.html:32
 msgid "No project facets."
-msgstr "Нет деталей о проекте."
+msgstr ""
 
 #: templates/search/faceted_results.html:54
 msgid "File"
-msgstr "Файл"
+msgstr ""
 
 #: templates/search/search.html:31
 #, python-format
 msgid "Results for %(query)s"
-msgstr "Результаты для %(query)s"
+msgstr ""
 
 #: templates/search/search.html:52 templates/search/search.html.py:54
 msgid "Previous"
-msgstr "Назад"
+msgstr ""
 
 #: templates/search/search.html:58 templates/search/search.html.py:60
 msgid "Next"
-msgstr "Вперёд"
+msgstr ""
 
 #: templates/sphinx/sphinx_rtd_theme/layout.html:47
 #: templates/sphinx/sphinx_rtd_theme/layout_old.html:131
 msgid "About these documents"
-msgstr "Об этих документах"
+msgstr ""
 
 #: templates/sphinx/sphinx_rtd_theme/layout.html:51
 #: templates/sphinx/sphinx_rtd_theme/layout_old.html:134
 msgid "Index"
-msgstr "Алфавитный указатель"
+msgstr ""
 
 #: templates/sphinx/sphinx_rtd_theme/layout_old.html:29
 msgid "Navigation"
-msgstr "Навигация"
+msgstr ""
 
 #: templates/sphinx/sphinx_rtd_theme/search.html:33
 msgid "Search Results"
-msgstr "Результаты поиска"
+msgstr ""
 
 #: templates/sphinx/sphinx_rtd_theme/search.html:35
 msgid ""
 "Your search did not match any documents. Please make sure that all words are"
 " spelled correctly and that you've selected enough categories."
-msgstr "В результате этого поиска документов не найдено. Пожалуйста, убедитесь, что все слова написаны правильно, и что вы выбрали достаточное количество категорий."
+msgstr ""
