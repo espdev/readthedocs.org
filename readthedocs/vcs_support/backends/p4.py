@@ -107,6 +107,7 @@ class Backend(BaseVCS):
 
     def co(self, identifier=None):
         self._revert()
+        self.make_clean_working_dir()
         info = self._sync(identifier)
 
         return info
