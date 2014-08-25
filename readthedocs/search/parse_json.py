@@ -11,11 +11,14 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def process_all_json_files(version):
+def process_all_json_files(version, build_dir=True):
     """
     Return a list of pages to index
     """
-    full_path = version.project.full_json_path(version.slug)
+    if build_dir:
+        full_path = version.project.full_json_path(version.slug)
+    else:
+        full_path = version.project.get_json_path(version.slug)
     html_files = []
     for root, dirs, files in os.walk(full_path):
         for filename in fnmatch.filter(files, '*.fjson'):
@@ -56,7 +59,28 @@ def process_file(filename):
     if 'body' in data:
         body = PyQuery(data['body'])
         body_content = body.text().replace(u'¶', '')
-        # Section stuff from inside the body
+        # Capture text inside h1 before the first h2
+        h1_section = body('.section > h1')
+        if h1_section:
+            div = h1_section.parent()
+            h1_title = h1_section.text().replace(u'¶', '').strip()
+            h1_id = div.attr('id')
+            h1_content = ""
+            next_p = body('h1').next()
+            while next_p:
+                if next_p[0].tag == 'div' and 'class' in next_p[0].attrib:
+                    if 'section' in next_p[0].attrib['class']:
+                        break
+                h1_content += "\n%s\n" % next_p.html()
+                next_p = next_p.next()
+            if h1_content:
+                sections.append({
+                    'id': h1_id,
+                    'title': h1_title,
+                    'content': h1_content,
+                })
+
+        # Capture text inside h2's
         section_list = body('.section > h2')
         for num in range(len(section_list)):
             div = section_list.eq(num).parent()

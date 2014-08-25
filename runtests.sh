@@ -1,5 +1,8 @@
 cd readthedocs
-DJANGO_SETTINGS_MODULE=settings.test ./manage.py test --logging-clear-handlers ./
+rm -rf rtd_tests/builds/
+export PYTHONPATH=`pwd`:$PYTHONPATH
+export DJANGO_SETTINGS_MODULE=settings.test
+coverage run -m py.test $*
 exit=$?
 cd -
 exit $exit

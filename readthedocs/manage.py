@@ -1,5 +1,11 @@
 #!/usr/bin/env python
+import os
+import sys
 
-import settings.local_srv
-from django.core.management import execute_manager
-execute_manager(settings.local_srv)
+if __name__ == "__main__":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.sqlite")
+    sys.path.append('readthedocs')
+
+    from django.core.management import execute_from_command_line
+
+    execute_from_command_line(sys.argv)

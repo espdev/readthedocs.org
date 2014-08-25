@@ -1,11 +1,12 @@
 import json
 
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from django.views.generic.list_detail import object_list
+from django.views.generic import ListView
 from django.utils.datastructures import SortedDict
 
 from taggit.models import Tag
@@ -16,32 +17,32 @@ from builds.models import Version
 from projects.models import Project
 
 
-def project_index(request, username=None, tag=None):
-    """
-    The list of projects, which will optionally filter by user or tag,
-    in which case a 'person' or 'tag' will be added to the context
-    """
-    queryset = Project.objects.public(request.user)
-    if username:
-        user = get_object_or_404(User, username=username)
-        queryset = queryset.filter(user=user)
-    else:
-        user = None
+class ProjectIndex(ListView):
+    model = Project
 
-    if tag:
-        tag = get_object_or_404(Tag, slug=tag)
-        queryset = queryset.filter(tags__name__in=[tag.slug])
-    else:
-        tag = None
+    def get_queryset(self):
+        queryset = Project.objects.public(self.request.user)
+        if self.kwargs.get('username'):
+            self.user = get_object_or_404(User, username=self.kwargs.get('username'))
+            queryset = queryset.filter(user=self.user)
+        else:
+            self.user = None
 
-    return object_list(
-        request,
-        queryset=queryset,
-        extra_context={'person': user, 'tag': tag},
-        page=int(request.GET.get('page', 1)),
-        template_object_name='project',
-    )
+        if self.kwargs.get('tag'):
+            self.tag = get_object_or_404(Tag, slug=self.kwargs.get('tag'))
+            queryset = queryset.filter(tags__name__in=[self.tag.slug])
+        else:
+            self.tag = None
 
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectIndex, self).get_context_data(**kwargs)
+        context['person'] = self.user
+        context['tag'] = self.tag
+        return context
+
+project_index = ProjectIndex.as_view()
 
 def project_detail(request, project_slug):
     """
@@ -51,36 +52,63 @@ def project_detail(request, project_slug):
     project = get_object_or_404(queryset, slug=project_slug)
     versions = project.versions.public(request.user, project)
     filter = VersionSlugFilter(request.GET, queryset=versions)
+    if request.is_secure():
+        protocol = 'https'
+    else:
+        protocol = 'http'
+    badge_url = "%s://%s%s?version=%s" % (
+        protocol, 
+        settings.PRODUCTION_DOMAIN,
+        reverse('project_badge', args=[project.slug]),
+        project.get_default_version(),
+    )
+    site_url = "%s://%s%s?badge=%s" % (
+        protocol,
+        settings.PRODUCTION_DOMAIN,
+        reverse('projects_detail', args=[project.slug]),
+        project.get_default_version(),
+    )
     return render_to_response(
         'projects/project_detail.html',
         {
             'project': project,
             'versions': versions,
             'filter': filter,
+            'badge_url': badge_url,
+            'site_url': site_url,
         },
         context_instance=RequestContext(request),
     )
 
-def project_badge(request, project_slug):
+def _badge_return(redirect, url):
+    if redirect:
+        return HttpResponseRedirect(url)
+    else:
+        response = requests.get(url)
+        return HttpResponse(response.content, mimetype="image/svg+xml")
+
+def project_badge(request, project_slug, redirect=False):
     """
     Return a sweet badge for the project
     """
     version_slug = request.GET.get('version', 'latest')
-    version = get_object_or_404(Version, project__slug=project_slug,
-                                slug=version_slug)
+    style = request.GET.get('style', '')
+    try:
+        version = Version.objects.get(project__slug=project_slug, slug=version_slug)
+    except Version.DoesNotExist:
+        url = 'http://img.shields.io/badge/Docs-Unknown%20Version-yellow.svg?style=' % style
+        return _badge_return(redirect, url)
     version_builds = version.builds.filter(type='html', state='finished').order_by('-date')
-    if not version_builds.count():
-        url = 'http://img.shields.io/badge/Docs-No%20Builds-yellow.svg'
-        response = requests.get(url)
-        return HttpResponse(response.content, mimetype="image/svg+xml")
+    if not version_builds.exists():
+        url = 'http://img.shields.io/badge/Docs-No%20Builds-yellow.svg%s' % style
+        return _badge_return(redirect, url)
+    last_build = version_builds[0]
+    if last_build.success:
+        color = 'green'
     else:
-        last_build = version_builds[0]
-    color = 'green'
-    if not last_build.success:
         color = 'red'
-    url = 'http://img.shields.io/badge/Docs-%s-%s.svg' % (version.slug, color)
-    response = requests.get(url)
-    return HttpResponse(response.content, mimetype="image/svg+xml")
+    url = 'http://img.shields.io/badge/Docs-%s-%s.svg?style=%s' % (version.slug.replace('-', '--'), color, style)
+    return _badge_return(redirect, url)
 
 def project_downloads(request, project_slug):
     """
@@ -115,41 +143,6 @@ def project_downloads(request, project_slug):
             'media_url_prefix': media_url_prefix,
         },
         context_instance=RequestContext(request),
-    )
-
-
-def tag_index(request):
-    """
-    List of all tags by most common
-    """
-    tag_qs = Project.tags.most_common()
-    return object_list(
-        request,
-        queryset=tag_qs,
-        page=int(request.GET.get('page', 1)),
-        template_object_name='tag',
-        template_name='projects/tag_list.html',
-    )
-
-
-def search(request):
-    """
-    our ghetto site search.  see roadmap.
-    """
-    if 'q' in request.GET:
-        term = request.GET['q']
-    else:
-        raise Http404
-    queryset = Project.objects.live(name__icontains=term)
-    if queryset.count() == 1:
-        return HttpResponseRedirect(queryset[0].get_absolute_url())
-
-    return object_list(
-        request,
-        queryset=queryset,
-        template_object_name='term',
-        extra_context={'term': term},
-        template_name='projects/search.html',
     )
 
 

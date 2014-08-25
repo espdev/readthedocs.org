@@ -1,18 +1,23 @@
 {% load i18n %}
-{% load markup %}
+{% load core_tags %}
 
-{% if project.description %}
-  <h3>{% trans "Description" %}</h3>
-  <div id="project_description">
-  <p>
-    {{ project.description|restructuredtext }}
-  </p>
-  </div>
-{% endif %}
+<div id="project_details">
+  <div class="wrapper">
+
+    <div id="project_description">
+    {% if project.description %}
+      <h3>{% trans "Description" %}</h3>
+      <div id="project_description">
+      <p>
+        {{ project.description|restructuredtext }}
+      </p>
+      </div>
+    {% endif %}
+    </div>
 
 <!-- BEGIN search bar -->
 <div class="search">
-  <form action="{% url haystack_project %}" method="GET">
+  <form action="{% url "haystack_project" %}" method="GET">
     <input type="text" name="q" value="" placeholder="{% blocktrans %}Search {{ project }}{% endblocktrans %}" id="id_site_search">
     <input type="hidden" name="selected_facets" value="project_exact:{{ project.name }}">
     <input type="submit" value="{% trans "Search" %}">
@@ -21,8 +26,8 @@
 <br>
 <!-- END search bar -->
 
-{% if versions %}
 <div class="module">
+{% if versions %}
   <div class="module-header">
     <h3>{% trans "Versions" %}</h3>
   </div>
@@ -57,7 +62,7 @@
         {% endif %}
           {% if request.user in project.users.all %}
             <ul class="module-item-menu">
-              <li><a href="{% url project_version_detail project.slug version.slug %}">{% trans "Edit" %}</a></li>
+              <li><a href="{% url "project_version_detail" project.slug version.slug %}">{% trans "Edit" %}</a></li>
             </ul>
           {% endif %}
         </li>
@@ -68,8 +73,8 @@
 
   <div class="build_a_version">
     <h3>{% trans "Build a version" %}</h3>
-    <div style="float: left; margin-right: 5px;" class="version_right">
-      <form method="post" action="{% url generic_build project.pk %}">
+    <div class="version_right">
+      <form method="post" action="{% url "generic_build" project.pk %}">
         <select id="id_version" name="version_slug">
         {% for version in project.ordered_active_versions %}
           <option value="{{ version.slug }}">{{ version.slug }}</option>
@@ -79,8 +84,8 @@
       </form>
     </div>
   </div>
-</div>{# END .module #}
 {% endif %}
+</div>{# END .module #}
 
 <div class="project_details">
 
@@ -89,11 +94,17 @@
     <p>{{ project.repo|urlize }}</p>
   {% endif %}
 
+    <h3>{% trans "Badge" %}</h3>
+      <a href="{{ site_url }}" style="text-decoration: none;" onclick="$('#badge_markup').toggle(); return false;">
+        <img src="{{ badge_url }}" />
+      </a>
+      {% include "core/badge_markup.html" with badge_url=badge_url site_url=site_url %}
+
   {% if project.tags.count %}
     <h3>{% trans "Tags" %}</h3>
     <p>
       {% for tag in project.tags.all %}
-        <a href="{% url projects_tag_detail tag.slug %}">{{ tag.name }}</a>{% if forloop.last %}{% else %}, {% endif %}
+        <a href="{% url "projects_tag_detail" tag.slug %}">{{ tag.name }}</a>{% if forloop.last %}{% else %}, {% endif %}
       {% empty %}
         <span class="quiet">{% trans "No tags" %}</span>
       {% endfor %}
@@ -101,7 +112,7 @@
   {% endif %}
 
   <h3>{% trans "Last Built" %}</h3>
-  <p>{{ project.modified_date|timesince }} ago</p>
+  <p>{{ project.builds.all.0.date|timesince }} ago</p>
 
   {% if project.project_url %}
     <h3>{% trans "Home Page" %}</h3>
@@ -157,7 +168,7 @@
 {% if request.user in project.users.all %}
   <h3>{% trans "Post Commit Hook" %}</h3>
     <p>
-        curl -X POST http://{{ PRODUCTION_DOMAIN }}{% url generic_build project.slug %}
+        curl -X POST http://{{ PRODUCTION_DOMAIN }}{% url "generic_build" project.slug %}
     </p>
 
 {% endif %}
@@ -184,3 +195,6 @@
   <!-- END projects list -->
   {% endif %}
 </div>{# END .project_details #}
+
+  </div>
+</div>

@@ -3,6 +3,8 @@ import logging
 import os
 import shutil
 
+from urlparse import urlparse
+
 from django.conf import settings
 
 log = logging.getLogger(__name__)
@@ -123,3 +125,21 @@ def make_latest(project):
         verbose_name='latest',
         identifier=branch,
     )
+
+
+def clean_url(url):
+    parsed = urlparse(url)
+    if parsed.scheme:
+        scheme, netloc = parsed.scheme, parsed.netloc
+    elif parsed.netloc:
+        scheme, netloc = "http", parsed.netloc
+    else:
+        scheme, netloc = "http", parsed.path
+    return netloc
+
+def cname_to_slug(host):
+    from dns import resolver
+    answer = [ans for ans in resolver.query(host, 'CNAME')][0]
+    domain = answer.target.to_unicode()
+    slug = domain.split('.')[0]
+    return slug

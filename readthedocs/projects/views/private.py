@@ -6,43 +6,48 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, HttpResponseNotAllowed, Http404
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from django.views.generic.list_detail import object_list
+from django.views.generic import ListView
+from django.utils.decorators import method_decorator
 
 from guardian.shortcuts import assign
 
 from builds.forms import AliasForm, VersionForm
 from builds.filters import VersionFilter
-from builds.models import Version
+from builds.models import VersionAlias, Version
 from projects.forms import (ImportProjectForm, build_versions_form,
                             build_upload_html_form, SubprojectForm,
                             UserForm, EmailHookForm, TranslationForm,
-                            AdvancedProjectForm)
-from projects.models import Project, EmailHook
+                            AdvancedProjectForm, RedirectForm, WebHookForm)
+from projects.models import Project, EmailHook, WebHook
 from projects import constants
+from redirects.models import Redirect
 
 
-@login_required
-def project_dashboard(request):
+class ProjectDashboard(ListView):
     """
     A dashboard!  If you aint know what that means you aint need to.
     Essentially we show you an overview of your content.
     """
-    qs = (Version.objects.active(user=request.user)
-          .filter(project__users__in=[request.user]))
-    filter = VersionFilter(constants.IMPORTANT_VERSION_FILTERS, queryset=qs)
-    return object_list(
-        request,
-        queryset=request.user.projects.live(),
-        page=int(request.GET.get('page', 1)),
-        template_object_name='project',
-        template_name='projects/project_dashboard.html',
-        extra_context={
-            'filter': filter,
-        }
-    )
+    model = Project
+    template_name='projects/project_dashboard.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProjectDashboard, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        return self.request.user.projects.live()
+
+    def get_context_data(self, **kwargs):
+        context = super(ProjectDashboard, self).get_context_data(**kwargs)
+        qs = (Version.objects.active(user=self.request.user)
+              .filter(project__users__in=[self.request.user]))
+        filter = VersionFilter(constants.IMPORTANT_VERSION_FILTERS, queryset=self.get_queryset())
+        context['filter'] = filter
+        return context
 
 
 @login_required
@@ -216,15 +221,18 @@ def edit_alias(request, project_slug, id=None):
     )
 
 
-@login_required
-def list_alias(request, project_slug):
-    proj = get_object_or_404(Project.objects.all(), slug=project_slug)
-    return object_list(
-        request,
-        queryset=proj.aliases.all(),
-        template_object_name='alias',
-        template_name='projects/alias_list.html',
-    )
+class AliasList(ListView):
+    model = VersionAlias
+    template_context_name = 'alias'
+    template_name='projects/alias_list.html',
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(AliasList, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        self.project = get_object_or_404(Project.objects.all(), slug=self.kwargs.get('project_slug'))
+        return self.project.aliases.all()
 
 
 @login_required
@@ -299,19 +307,31 @@ def project_users_delete(request, project_slug):
 def project_notifications(request, project_slug):
     project = get_object_or_404(request.user.projects.live(),
                                 slug=project_slug)
-    form = EmailHookForm(data=request.POST or None, project=project)
 
-    if request.method == 'POST' and form.is_valid():
-        form.save()
+    email_form = EmailHookForm(data=request.POST or None, project=project)
+    webhook_form = WebHookForm(data=request.POST or None, project=project)
+
+    if request.method == 'POST':
+        if email_form.is_valid():
+            email_form.save()
+        if webhook_form.is_valid():
+            webhook_form.save()
         project_dashboard = reverse('projects_notifications',
                                     args=[project.slug])
         return HttpResponseRedirect(project_dashboard)
 
     emails = project.emailhook_notifications.all()
+    urls = project.webhook_notifications.all()
 
     return render_to_response(
         'projects/project_notifications.html',
-        {'form': form, 'project': project, 'emails': emails},
+        {
+            'email_form': email_form, 
+            'webhook_form': webhook_form, 
+            'project': project, 
+            'emails': emails,
+            'urls': urls,
+        },
         context_instance=RequestContext(request)
     )
 
@@ -322,9 +342,13 @@ def project_notifications_delete(request, project_slug):
         raise Http404
     project = get_object_or_404(request.user.projects.live(),
                                 slug=project_slug)
-    notification = get_object_or_404(EmailHook.objects.all(),
-                                     email=request.POST.get('email'))
-    notification.delete()
+    try:
+        project.emailhook_notifications.get(email=request.POST.get('email')).delete()
+    except EmailHook.DoesNotExist:
+        try:
+            project.webhook_notifications.get(url=request.POST.get('email')).delete()
+        except WebHook.DoesNotExist:
+            raise Http404
     project_dashboard = reverse('projects_notifications', args=[project.slug])
     return HttpResponseRedirect(project_dashboard)
 
@@ -357,4 +381,41 @@ def project_translations_delete(request, project_slug, child_slug):
     subproj = get_object_or_404(Project.objects.public(), slug=child_slug)
     project.translations.remove(subproj)
     project_dashboard = reverse('projects_translations', args=[project.slug])
+    return HttpResponseRedirect(project_dashboard)
+
+
+@login_required
+def project_redirects(request, project_slug):
+    project = get_object_or_404(request.user.projects.live(),
+                                slug=project_slug)
+
+    form = RedirectForm(data=request.POST or None, project=project)
+
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        project_dashboard = reverse('projects_redirects', args=[project.slug])
+        return HttpResponseRedirect(project_dashboard)
+
+    redirects = project.redirects.all()
+
+    return render_to_response(
+        'projects/project_redirects.html',
+        {'form': form, 'project': project, 'redirects': redirects},
+        context_instance=RequestContext(request)
+    )
+
+
+@login_required
+def project_redirects_delete(request, project_slug):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed('Only POST is allowed')
+    project = get_object_or_404(request.user.projects.live(),
+                                slug=project_slug)
+    redirect = get_object_or_404(Redirect.objects.all(),
+                             pk=request.POST.get('pk'))
+    if redirect.project == project:
+        redirect.delete()
+    else:
+        raise Http404
+    project_dashboard = reverse('projects_redirects', args=[project.slug])
     return HttpResponseRedirect(project_dashboard)
