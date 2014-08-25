@@ -105,6 +105,16 @@ class Backend(BaseVCS):
 
         return vcs_tags
 
+    @property
+    def commit(self):
+        info = self.p4.run('changes', '-s', 'submitted', '-m', '1',
+                           '{}/...#have'.format(self.working_dir))
+        try:
+            stdout = info[0]['change']
+        except Exception:
+            stdout = 'Unknown'
+        return stdout
+
     def co(self, identifier=None):
         self._revert()
         self.make_clean_working_dir()
