@@ -8,8 +8,7 @@ from tastypie.api import Api
 from api.base import (ProjectResource, UserResource, BuildResource,
                       VersionResource, FileResource)
 from builds.filters import VersionFilter
-from core.forms import UserProfileForm
-from core.views import SearchView
+from core.views import HomepageView, SearchView
 from projects.feeds import LatestProjectsFeed, NewProjectsFeed
 from projects.filters import ProjectFilter
 from projects.constants import LANGUAGES_REGEX
@@ -28,7 +27,7 @@ handler404 = 'core.views.server_error_404'
 
 urlpatterns = patterns(
     '',  # base view, flake8 complains if it is on the previous line.
-    url(r'^$', 'core.views.homepage'),
+    url(r'^$', HomepageView.as_view(), name='homepage'),
     url(r'^security/', TemplateView.as_view(template_name='security.html')),
 
     # For serving docs locally and when nginx isn't
@@ -73,9 +72,12 @@ urlpatterns = patterns(
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^projects/', include('projects.urls.public')),
     url(r'^builds/', include('builds.urls')),
-    url(r'^accounts/', include('allauth.urls')),
+    url(r'^bookmarks/', include('bookmarks.urls')),
+    # Ship elastic search
+    url(r'^search/$', 'search.views.elastic_search', name='search'),
+    url(r'^elasticsearch/$', 'search.views.elastic_search', name='elastic_search'),
     url(r'^search/project/', SearchView.as_view(), name='haystack_project'),
-    url(r'^search/', include('haystack.urls')),
+    #url(r'^search/', include('haystack.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dashboard/', include('projects.urls.private')),
     url(r'^github', 'core.views.github_build', name='github_build'),
@@ -87,7 +89,7 @@ urlpatterns = patterns(
         'core.views.random_page',
         name='random_page'),
     url(r'^random/$', 'core.views.random_page', name='random_page'),
-    url(r'^donate/$', 'core.views.donate', name='donate'),
+    url(r'^sustainability/', include('donate.urls')),
     url(r'^depth/$', 'core.views.queue_depth', name='queue_depth'),
     url(r'^queue_info/$', 'core.views.queue_info', name='queue_info'),
     url(r'^live/$', 'core.views.live_builds', name='live_builds'),
@@ -103,13 +105,13 @@ urlpatterns = patterns(
     url(r'^wipe/(?P<project_slug>[-\w]+)/(?P<version_slug>[\w]{1}[-\w\.]+)/$',
         'core.views.wipe_version',
         name='wipe_version'),
-    url(r'^profiles/create/', 'profiles.views.create_profile',
-        {'form_class': UserProfileForm},
-        name='profiles_profile_create'),
-    url(r'^profiles/edit/', 'profiles.views.edit_profile',
-        {'form_class': UserProfileForm},
-        name='profiles_profile_edit'),
-    url(r'^profiles/', include('profiles.urls')),
+
+
+    url(r'^websupport/', include('comments.urls')),
+    url(r'^profiles/', include('profiles.urls.public')),
+    url(r'^accounts/', include('profiles.urls.private')),
+    url(r'^accounts/', include('allauth.urls')),
+    url(r'^accounts/gold/', include('gold.urls')),
     url(r'^api/', include(v1_api.urls)),
     url(r'^api/v2/', include('restapi.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

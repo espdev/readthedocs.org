@@ -9,7 +9,7 @@
 {% block editing-option-edit-proj %}class="active"{% endblock %}
 
 {% block project-notifications-active %}active{% endblock %}
-{% block project_edit_content_header %}{{ project.name }} <small class="quiet">{% trans "Notifications" %}</small>{% endblock %}
+{% block project_edit_content_header %}{% trans "Notifications" %}{% endblock %}
 
 {% block project_edit_content %}
   <p class="help_text">
@@ -72,7 +72,7 @@
 
   <h3>{% trans "New Webhook Notifications" %}</h3>
   <p>
-    {% trans "Add an URL to notify" %}
+    {% trans "Add a URL to notify" %}
   </p>
   <form method="post" action=".">{% csrf_token %}
     {{ webhook_form }}

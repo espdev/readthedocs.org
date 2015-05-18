@@ -9,13 +9,7 @@ class CoreTagsTests(TestCase):
     def setUp(self):
         self.client.login(username='eric', password='test')
         self.pip = Project.objects.get(slug='pip')
-        self.latest = Version.objects.create(project=self.pip, identifier='latest',
-                               verbose_name='latest', slug='latest',
-                               active=True)
         self.pip_fr = Project.objects.create(name="PIP-FR", slug='pip-fr', language='fr', main_language_project=self.pip)
-        self.latest_fr = Version.objects.create(project=self.pip_fr, identifier='latest',
-                               verbose_name='latest', slug='latest',
-                               active=True)
 
     def test_project_only(self):
         proj = Project.objects.get(slug='pip')
@@ -154,4 +148,28 @@ class CoreTagsTests(TestCase):
         self.assertEqual(url, '/docs/pip/fr/abc/index.html#document-xyz')
         url = core_tags.make_document_url(proj, 'abc', 'index')
         self.assertEqual(url, '/docs/pip/fr/abc/')
+
+    def test_mkdocs(self):
+        proj = Project.objects.get(slug='pip')
+        proj.documentation_type = 'mkdocs'
+        url = core_tags.make_document_url(proj, 'latest', 'document')
+        self.assertEqual(url, '/docs/pip/en/latest/document.html')
+
+    def test_mkdocs_no_directory_urls(self):
+        proj = Project.objects.get(slug='pip')
+        proj.documentation_type = 'mkdocs'
+        url = core_tags.make_document_url(proj, 'latest', 'document.html')
+        self.assertEqual(url, '/docs/pip/en/latest/document.html')
+
+    def test_mkdocs_index(self):
+        proj = Project.objects.get(slug='pip')
+        proj.documentation_type = 'mkdocs'
+        url = core_tags.make_document_url(proj, 'latest', 'index')
+        self.assertEqual(url, '/docs/pip/en/latest/')
+
+    def test_mkdocs_index_no_directory_urls(self):
+        proj = Project.objects.get(slug='pip')
+        proj.documentation_type = 'mkdocs'
+        url = core_tags.make_document_url(proj, 'latest', 'index.html')
+        self.assertEqual(url, '/docs/pip/en/latest/')
 

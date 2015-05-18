@@ -18,7 +18,7 @@ def process_all_json_files(version, build_dir=True):
     if build_dir:
         full_path = version.project.full_json_path(version.slug)
     else:
-        full_path = version.project.get_json_path(version.slug)
+        full_path = version.project.get_production_media_path(type='json', version_slug=version.slug, include_file=False)
     html_files = []
     for root, dirs, files in os.walk(full_path):
         for filename in fnmatch.filter(files, '*.fjson'):
@@ -27,9 +27,12 @@ def process_all_json_files(version, build_dir=True):
             html_files.append(os.path.join(root, filename))
     page_list = []
     for filename in html_files:
-        result = process_file(filename)
-        if result:
-            page_list.append(result)
+        try:
+            result = process_file(filename)
+            if result:
+                page_list.append(result)
+        except:
+            pass
     return page_list
 
 
@@ -49,14 +52,14 @@ def process_file(filename):
     if 'current_page_name' in data:
         path = data['current_page_name']
     else:
-        log.error('Unable to index file due to no name %s' % filename)
+        log.info('Unable to index file due to no name %s' % filename)
         return None
     if 'toc' in data:
         for element in PyQuery(data['toc'])('a'):
             headers.append(recurse_while_none(element))
         if None in headers:
-            log.error('Unable to index file headers for: %s' % filename)
-    if 'body' in data:
+            log.info('Unable to index file headers for: %s' % filename)
+    if 'body' in data and len(data['body']):
         body = PyQuery(data['body'])
         body_content = body.text().replace(u'¶', '')
         # Capture text inside h1 before the first h2
@@ -96,13 +99,13 @@ def process_file(filename):
             log.debug("(Search Index) Section [%s:%s]: %s" % (section_id, title, content))
 
     else:
-        log.error('Unable to index content for: %s' % filename)
+        log.info('Unable to index content for: %s' % filename)
     if 'title' in data:
         title = data['title']
         if title.startswith('<'):
             title = PyQuery(data['title']).text()
     else:
-        log.error('Unable to index title for: %s' % filename)
+        log.info('Unable to index title for: %s' % filename)
 
     return {'headers': headers, 'content': body_content, 'path': path,
             'title': title, 'sections': sections}

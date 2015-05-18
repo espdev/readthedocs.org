@@ -22,3 +22,22 @@ Incompatible Changes policy, much like the 1.0 of a code base, once we define
 the redirects and interfaces that we wish to expose permanently.
 
 .. _mailing list: https://groups.google.com/forum/#!forum/read-the-docs
+
+
+Commercial Support
+------------------
+
+We offer commerical support for Read the Docs,
+commerical hosting,
+as well as consulting around all documentation systems.
+You can contact us at hello@readthedocs.com to learn more,
+or visit us at https://readthedocs.com.
+
+Named Support Contact
+~~~~~~~~~~~~~~~~~~~~~
+
+This level of support gives you priority access to our time.
+Your support requests will be processed in our Priority Support Queue,
+and you will have access to a dedicated support person at Read the Docs.
+
+

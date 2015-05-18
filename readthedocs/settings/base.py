@@ -14,8 +14,8 @@ PRODUCTION_DOMAIN = 'readthedocs.org'
 USE_SUBDOMAIN = False
 
 ADMINS = (
-    ('Charlie Leifer', 'coleifer@gmail.com'),
-    ('Eric Holscher', 'eric@ericholscher.com'),
+    ('Eric Holscher', 'eric@readthedocs.org'),
+    ('Anthony Johnson', 'anthony@readthedocs.org'),
 )
 
 MANAGERS = ADMINS
@@ -26,9 +26,15 @@ UPLOAD_ROOT = os.path.join(SITE_ROOT, 'user_uploads')
 CNAME_ROOT = os.path.join(SITE_ROOT, 'cnames')
 LOGS_ROOT = os.path.join(SITE_ROOT, 'logs')
 
+# A new base for production files
+PRODUCTION_ROOT = os.path.join(SITE_ROOT, 'prod_artifacts')
+PRODUCTION_MEDIA_ARTIFACTS = os.path.join(PRODUCTION_ROOT, 'media')
+
 MEDIA_ROOT = '%s/media/' % (SITE_ROOT)
 MEDIA_URL = '/media/'
 ADMIN_MEDIA_PREFIX = '/media/admin/'
+
+GROK_API_HOST = 'https://api.grokthedocs.com'
 
 # For 1.4
 STATIC_ROOT = os.path.join(SITE_ROOT, 'media/static/')
@@ -49,6 +55,10 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 FORCE_WWW = False
 #APPEND_SLASH = False
 
+# Docker
+DOCKER_ENABLE = False
+DOCKER_IMAGE = 'rtfd-build'
+
 TIME_ZONE = 'America/Chicago'
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = (
@@ -64,6 +74,7 @@ LANGUAGES = (
     ('zh-tw', gettext('Taiwanese')),
     ('ja', gettext('Japanese')),
     ('uk', gettext('Ukrainian')),
+    ('it', gettext('Italian')),
 )
 LOCALE_PATHS = [
     os.path.join(SITE_ROOT, 'readthedocs', 'locale'),
@@ -73,7 +84,7 @@ LOCALE_PATHS = [
 USE_I18N = True
 USE_L10N = True
 SITE_ID = 1
-SECRET_KEY = 'asciidick'
+SECRET_KEY = 'replace-this-please'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
@@ -107,12 +118,26 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
+# All auth
+
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 
 CORS_ORIGIN_REGEX_WHITELIST = ('^http://(.+)\.readthedocs\.org$', '^https://(.+)\.readthedocs\.org$')
 # So people can post to their accounts
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = (
+    'x-requested-with',
+    'content-type',
+    'accept',
+    'origin',
+    'authorization',
+    'x-csrftoken'
+)
+
+
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
@@ -121,6 +146,7 @@ TEMPLATE_DIRS = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
+    "django.contrib.messages.context_processors.messages",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
@@ -139,6 +165,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
+    'django.contrib.messages',
 
     # third party apps
     'pagination',
@@ -153,7 +180,6 @@ INSTALLED_APPS = [
 
     # Celery bits
     'djcelery',
-    'celery_haystack',
 
     # daniellindsleyrocksdahouse
     'haystack',
@@ -162,20 +188,26 @@ INSTALLED_APPS = [
 
 
     # our apps
+    'bookmarks',
+    'projects',
     'builds',
+    'comments',
     'core',
     'doc_builder',
-    'projects',
+    'oauth',
     'redirects',
     'rtd_tests',
     'restapi',
+    'privacy',
+    'gold',
+    'donate',
 
     # allauth
     'allauth',
     'allauth.account',
-    'allauth.socialaccount', 
-    #'allauth.socialaccount.providers.github',
-    #'allauth.socialaccount.providers.bitbucket',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.bitbucket',
     #'allauth.socialaccount.providers.twitter',
 ]
 
@@ -194,24 +226,14 @@ if DEBUG:
 
 #CARROT_BACKEND = "ghettoq.taproot.Database"
 CELERY_ALWAYS_EAGER = True
-CELERYD_TASK_TIME_LIMIT = 60*60  # 60 minutes
+CELERYD_TASK_TIME_LIMIT = 60 * 60  # 60 minutes
 CELERY_SEND_TASK_ERROR_EMAILS = False
 CELERYD_HIJACK_ROOT_LOGGER = False
 # Don't queue a bunch of tasks in the workers
 CELERYD_PREFETCH_MULTIPLIER = 1
-HAYSTACK_SIGNAL_PROCESSOR = 'celery_haystack.signals.CelerySignalProcessor'
-
-CELERY_ROUTES = {
-    'celery_haystack.tasks.CeleryHaystackSignalHandler': {
-        'queue': 'celery_haystack',
-    },
-    'projects.tasks.fileify': {
-        'queue': 'celery_haystack',
-    },
-}
-
 
 DEFAULT_FROM_EMAIL = "no-reply@readthedocs.org"
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
 SESSION_COOKIE_DOMAIN = 'readthedocs.org'
 
 HAYSTACK_CONNECTIONS = {
@@ -248,13 +270,33 @@ if LOG_DEBUG:
 GUARDIAN_RAISE_403 = True
 ANONYMOUS_USER_ID = -1
 
+# Stripe
+STRIPE_SECRET = None
+STRIPE_PUBLISHABLE = None
+
 # RTD Settings
 REPO_LOCK_SECONDS = 30
 ALLOW_PRIVATE_REPOS = False
 
 GLOBAL_ANALYTICS_CODE = 'UA-17997319-1'
 
+GRAVATAR_DEFAULT_IMAGE = 'http://media.readthedocs.org/images/silhouette.png'
+
 LOG_FORMAT = "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s"
+
+RESTRUCTUREDTEXT_FILTER_SETTINGS = {
+    'cloak_email_addresses': True,
+    'file_insertion_enabled': False,
+    'raw_enabled': False,
+    'strip_comments': True,
+    'doctitle_xform': True,
+    'sectsubtitle_xform': True,
+    'initial_header_level': 2,
+    'report_level': 5,
+    'syntax_highlight': 'none',
+    'math_output': 'latex',
+    'field_name_limit': 50,
+}
 
 LOGGING = {
     'version': 1,
@@ -266,10 +308,10 @@ LOGGING = {
         },
     },
     'filters': {
-         'require_debug_false': {
-             '()': 'django.utils.log.RequireDebugFalse'
-         }
-     },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
     'handlers': {
         'null': {
             'level': 'DEBUG',
@@ -323,9 +365,17 @@ LOGGING = {
             'backupCount': backup_count,
             'formatter': 'standard',
         },
+        'search': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOGS_ROOT, "search.log"),
+            'maxBytes': maxBytes,
+            'backupCount': backup_count,
+            'formatter': 'standard',
+        },
         'mail_admins': {
             'level': 'ERROR',
-             'filters': ['require_debug_false'],
+            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
         },
         'console': {
@@ -363,6 +413,16 @@ LOGGING = {
         'django.request': {
             'handlers': ['exceptionlog'],
             'level': 'ERROR',
+            'propagate': False,
+        },
+        'projects.views.public.search': {
+            'handlers': ['search'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'search': {
+            'handlers': ['search'],
+            'level': 'DEBUG',
             'propagate': False,
         },
         # Uncomment if you want to see Elasticsearch queries in the console.

@@ -1,3 +1,5 @@
+from random import choice
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -6,46 +8,75 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 
+from guardian.shortcuts import assign
+
+from core.utils import trigger_build
 from redirects.models import Redirect
 from projects import constants
 from projects.models import Project, EmailHook, WebHook
-from projects.tasks import update_docs
 
 
 class ProjectForm(forms.ModelForm):
     required_css_class = "required"
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ProjectForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        project = super(ProjectForm, self).save(commit)
+        if commit:
+            if self.user and not project.users.filter(pk=self.user.pk).exists():
+                project.users.add(self.user)
+        return project
+
+
+class ProjectTriggerBuildMixin(object):
+    '''Mixin to trigger build on form save
+
+    This should be replaced with signals instead of calling trigger_build
+    explicitly.
+    '''
+
+    def save(self, commit=True):
+        '''Trigger build on commit save'''
+        project = super(ProjectTriggerBuildMixin, self).save(commit)
+        if commit:
+            trigger_build(project=project)
+        return project
+
+
+class ProjectBackendForm(forms.Form):
+    '''Get the import backend'''
+    backend = forms.CharField()
+
+
+class ProjectBasicsForm(ProjectForm):
+    '''Form for basic project fields'''
+
+    class Meta:
+        model = Project
+        fields = ('name', 'repo', 'repo_type')
+
+    def __init__(self, *args, **kwargs):
+        show_advanced = kwargs.pop('show_advanced', False)
+        super(ProjectBasicsForm, self).__init__(*args, **kwargs)
+        if show_advanced:
+            self.fields['advanced'] = forms.BooleanField(
+                required=False,
+                label=_('Edit advanced project options')
+            )
+        self.fields['repo'].widget.attrs['placeholder'] = self.placehold_repo()
+        self.fields['repo'].widget.attrs['required'] = True
+
     def clean_name(self):
         name = self.cleaned_data.get('name', '')
         if not self.instance.pk:
             potential_slug = slugify(name)
-            if Project.objects.filter(slug=potential_slug).count():
+            if Project.objects.filter(slug=potential_slug).exists():
                 raise forms.ValidationError(
-                    _('A project with that name exists already!')
-                )
-
+                    _('Invalid project name, a project already exists with that name'))
         return name
-
-
-class ImportProjectForm(ProjectForm):
-    repo = forms.CharField(required=True,
-                           help_text=_(u'URL for your code (hg or git). Ex. '
-                                       u'http://github.com/ericholscher/django'
-                                       u'-kong.git'))
-
-    class Meta:
-        model = Project
-        fields = (
-            # Important
-            'name', 'repo', 'repo_type',
-            # Not as important
-            'description',
-            'language',
-            'documentation_type',
-            'project_url',
-            'canonical_url',
-            'tags',
-        )
 
     def clean_repo(self):
         repo = self.cleaned_data.get('repo', '').strip()
@@ -58,17 +89,43 @@ class ImportProjectForm(ProjectForm):
                   u'public (http:// or git://) clone url'))
         return repo
 
-    def save(self, *args, **kwargs):
-        # save the project
-        project = super(ImportProjectForm, self).save(*args, **kwargs)
+    def placehold_repo(self):
+        return choice([
+            'https://bitbucket.org/cherrypy/cherrypy',
+            'https://bitbucket.org/birkenfeld/sphinx',
+            'https://bitbucket.org/hpk42/tox',
+            'https://github.com/zzzeek/sqlalchemy.git',
+            'https://github.com/django/django.git',
+            'https://github.com/fabric/fabric.git',
+            'https://github.com/ericholscher/django-kong.git',
+        ])
 
-        # kick off the celery job
-        update_docs.delay(pk=project.pk)
 
-        return project
+class ProjectExtraForm(ProjectForm):
+
+    class Meta:
+        model = Project
+        fields = (
+            'description',
+            'documentation_type',
+            'language', 'programming_language',
+            'project_url',
+            'canonical_url',
+            'tags',
+        )
+
+    def __init__(self, *args, **kwargs):
+        super(ProjectExtraForm, self).__init__(*args, **kwargs)
+        self.fields['canonical_url'].widget.attrs['placeholder'] = self.placehold_canonical_url()
+
+    def placehold_canonical_url(self):
+        return choice([
+            'http://docs.fabfile.org',
+            'http://example.readthedocs.org',
+        ])
 
 
-class AdvancedProjectForm(ProjectForm):
+class ProjectAdvancedForm(ProjectTriggerBuildMixin, ProjectForm):
     python_interpreter = forms.ChoiceField(
         choices=constants.PYTHON_CHOICES, initial='python',
         help_text=_("(Beta) The Python interpreter used to create the virtual "
@@ -93,7 +150,7 @@ class AdvancedProjectForm(ProjectForm):
             # Fringe
             'analytics_code',
             # Version Support
-            'num_major', 'num_minor', 'num_point',
+            # 'num_major', 'num_minor', 'num_point',
         )
 
     def clean_conf_py_file(self):
@@ -104,14 +161,25 @@ class AdvancedProjectForm(ProjectForm):
                   'conf.py in it.'))
         return file
 
-    def save(self, *args, **kwargs):
-        # save the project
-        project = super(AdvancedProjectForm, self).save(*args, **kwargs)
 
-        # kick off the celery job
-        update_docs.delay(pk=project.pk)
+class UpdateProjectForm(ProjectTriggerBuildMixin, ProjectBasicsForm,
+                        ProjectExtraForm):
 
-        return project
+    class Meta:
+        model = Project
+        fields = (
+            # Basics
+            'name', 'repo', 'repo_type',
+            # Extra
+            #'allow_comments',
+            #'comment_moderation',
+            'description',
+            'documentation_type',
+            'language', 'programming_language',
+            'project_url',
+            'canonical_url',
+            'tags',
+        )
 
 
 class DualCheckboxWidget(forms.CheckboxInput):
@@ -159,15 +227,14 @@ class BaseVersionsForm(forms.Form):
         version.privacy_level = privacy_level
         version.save()
         if version.active and not version.built and not version.uploaded:
-            update_docs.delay(self.project.pk, record=True,
-                              version_pk=version.pk)
+            trigger_build(project=self.project, version=version)
 
 
 def build_versions_form(project):
     attrs = {
         'project': project,
     }
-    versions_qs = project.versions.all()
+    versions_qs = project.versions.all() # Admin page, so show all versions
     active = versions_qs.filter(active=True)
     if active.exists():
         choices = [(version.slug, version.verbose_name) for version in active]
@@ -179,8 +246,12 @@ def build_versions_form(project):
     for version in versions_qs:
         field_name = 'version-%s' % version.slug
         privacy_name = 'privacy-%s' % version.slug
+        if version.type == 'tag':
+            label = "%s (%s)" % (version.verbose_name, version.identifier[:8])
+        else:
+            label = version.verbose_name
         attrs[field_name] = forms.BooleanField(
-            label=version.verbose_name,
+            label=label,
             widget=DualCheckboxWidget(version),
             initial=version.active,
             required=False,
@@ -221,7 +292,7 @@ def build_upload_html_form(project):
     attrs = {
         'project': project,
     }
-    active = project.versions.all()
+    active = project.versions.public()
     if active.exists():
         choices = []
         choices += [(version.slug, version.verbose_name) for version in active]
@@ -241,7 +312,7 @@ class SubprojectForm(forms.Form):
 
     def clean_subproject(self):
         subproject_name = self.cleaned_data['subproject']
-        subproject_qs = Project.objects.filter(name=subproject_name)
+        subproject_qs = Project.objects.filter(slug=subproject_name)
         if not subproject_qs.exists():
             raise forms.ValidationError((_("Project %(name)s does not exist")
                                          % {'name': subproject_name}))
@@ -271,6 +342,8 @@ class UserForm(forms.Form):
 
     def save(self):
         self.project.users.add(self.user)
+        # Force update of permissions
+        assign('view_project', self.user, self.project)
         return self.user
 
 
@@ -316,7 +389,7 @@ class TranslationForm(forms.Form):
 
     def clean_project(self):
         subproject_name = self.cleaned_data['project']
-        subproject_qs = Project.objects.filter(name=subproject_name)
+        subproject_qs = Project.objects.filter(slug=subproject_name)
         if not subproject_qs.exists():
             raise forms.ValidationError((_("Project %(name)s does not exist")
                                          % {'name': subproject_name}))
@@ -346,3 +419,4 @@ class RedirectForm(forms.ModelForm):
             to_url=self.cleaned_data['to_url'],
         )
         return redirect
+

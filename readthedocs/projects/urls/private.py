@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
 
-from projects.views.private import AliasList, ProjectDashboard
+from projects.views.private import AliasList, ProjectDashboard, ImportView
+from projects.backends.views import ImportWizardView, ImportDemoView
+
 
 urlpatterns = patterns(
     # base view, flake8 complains if it is on the previous line.
@@ -10,8 +12,37 @@ urlpatterns = patterns(
         name='projects_dashboard'),
 
     url(r'^import/$',
-        'projects.views.private.project_import',
+        ImportView.as_view(wizard_class=ImportWizardView),
+        {'wizard': ImportWizardView},
         name='projects_import'),
+
+    url(r'^import/manual/$',
+        ImportWizardView.as_view(),
+        name='projects_import_manual'),
+
+    url(r'^import/manual/demo/$',
+        ImportDemoView.as_view(),
+        name='projects_import_demo'),
+
+    url(r'^import/github/$',
+        'projects.views.private.project_import_github',
+        {'sync': False},
+        name='projects_import_github'),
+
+    url(r'^import/github/sync/$',
+        'projects.views.private.project_import_github',
+        {'sync': True},
+        name='projects_sync_github'),
+
+    url(r'^import/bitbucket/$',
+        'projects.views.private.project_import_bitbucket',
+        {'sync': False},
+        name='projects_import_bitbucket'),
+
+    url(r'^import/bitbucket/sync/$',
+        'projects.views.private.project_import_bitbucket',
+        {'sync': True},
+        name='projects_sync_bitbucket'),
 
     url(r'^(?P<project_slug>[-\w]+)/$',
         'projects.views.private.project_manage',
@@ -29,6 +60,10 @@ urlpatterns = patterns(
         AliasList.as_view(),
         name='projects_alias_list'),
 
+    url(r'^(?P<project_slug>[-\w]+)/comments_moderation/$',
+        'projects.views.private.project_comments_moderation',
+        name='projects_comments_moderation'),
+
     url(r'^(?P<project_slug>[-\w]+)/edit/$',
         'projects.views.private.project_edit',
         name='projects_edit'),
@@ -37,7 +72,11 @@ urlpatterns = patterns(
         'projects.views.private.project_advanced',
         name='projects_advanced'),
 
-    url(r'^(?P<project_slug>[-\w]+)/version/(?P<version_slug>[-\w.]+)/$',
+    url(r'^(?P<project_slug>[-\w]+)/version/(?P<version_slug>[^/]+)/delete_html/$',
+        'projects.views.private.project_version_delete_html',
+        name='project_version_delete_html'),
+
+    url(r'^(?P<project_slug>[-\w]+)/version/(?P<version_slug>[^/]+)/$',
         'projects.views.private.project_version_detail',
         name='project_version_detail'),
 
@@ -68,6 +107,10 @@ urlpatterns = patterns(
     url(r'^(?P<project_slug>[-\w]+)/notifications/$',
         'projects.views.private.project_notifications',
         name='projects_notifications'),
+
+    url(r'^(?P<project_slug>[-\w]+)/comments/$',
+        'projects.views.private.project_comments_settings',
+        name='projects_comments'),
 
     url(r'^(?P<project_slug>[-\w]+)/notifications/delete/$',
         'projects.views.private.project_notifications_delete',

@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseNotFound
 from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.db.models import Max, F
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
@@ -16,12 +17,16 @@ from django.views.generic import TemplateView
 from haystack.query import EmptySearchQuerySet
 from haystack.query import SearchQuerySet
 from celery.task.control import inspect
+import stripe
 
 from builds.models import Build
 from builds.models import Version
 from core.forms import FacetedSearchForm
+from core.utils import trigger_build
+from donate.mixins import DonateProgressMixin
+from projects import constants
 from projects.models import Project, ImportedFile, ProjectRelationship
-from projects.tasks import update_docs, remove_dir
+from projects.tasks import remove_dir, update_imported_docs
 from redirects.models import Redirect
 from redirects.utils import redirect_filename
 
@@ -40,17 +45,23 @@ class NoProjectException(Exception):
     pass
 
 
-def homepage(request):
-    latest_builds = Build.objects.order_by('-date')[:100]
-    latest = []
-    for build in latest_builds:
-        if build.project not in latest and len(latest) < 10:
-            latest.append(build.project)
-    featured = Project.objects.filter(featured=True)
-    return render_to_response('homepage.html',
-                              {'project_list': latest,
-                               'featured_list': featured},
-                              context_instance=RequestContext(request))
+class HomepageView(DonateProgressMixin, TemplateView):
+
+    template_name = 'homepage.html'
+
+    def get_context_data(self, **kwargs):
+        '''Add latest builds and featured projects'''
+        context = super(HomepageView, self).get_context_data(**kwargs)
+        latest = []
+        latest_builds = Build.objects.order_by('-date')[:100]
+        for build in latest_builds:
+            if (build.project.privacy_level == constants.PUBLIC
+                    and build.project not in latest
+                    and len(latest) < 10):
+                latest.append(build.project)
+        context['project_list'] = latest
+        context['featured_list'] = Project.objects.filter(featured=True)
+        return context
 
 
 def random_page(request, project=None):
@@ -64,11 +75,6 @@ def random_page(request, project=None):
 def queue_depth(request):
     r = redis.Redis(**settings.REDIS)
     return HttpResponse(r.llen('celery'))
-
-
-def donate(request):
-    return render_to_response('donate.html',
-                              context_instance=RequestContext(request))
 
 
 def queue_info(request):
@@ -138,15 +144,13 @@ def _build_version(project, slug, already_built=()):
         # these will build at "latest", and thus won't be
         # active
         latest_version = project.versions.get(slug='latest')
-        update_docs.delay(
-            pk=project.pk, version_pk=latest_version.pk, force=True)
+        trigger_build(project=project, version=latest_version, force=True)
         pc_log.info(("(Version build) Building %s:%s"
                      % (project.slug, latest_version.slug)))
         if project.versions.exclude(active=False).filter(slug=slug).exists():
             # Handle the case where we want to build the custom branch too
             slug_version = project.versions.get(slug=slug)
-            update_docs.delay(
-                pk=project.pk, version_pk=slug_version.pk, force=True)
+            trigger_build(project=project, version=slug_version, force=True)
             pc_log.info(("(Version build) Building %s:%s"
                          % (project.slug, slug_version.slug)))
         return "latest"
@@ -155,7 +159,7 @@ def _build_version(project, slug, already_built=()):
         return None
     elif slug not in already_built:
         version = project.versions.get(slug=slug)
-        update_docs.delay(pk=project.pk, version_pk=version.pk, force=True)
+        trigger_build(project=project, version=version, force=True)
         pc_log.info(("(Version build) Building %s:%s"
                      % (project.slug, version.slug)))
         return slug
@@ -187,6 +191,10 @@ def _build_url(url, branches):
             raise NoProjectException()
         for project in projects:
             (to_build, not_building) = _build_branches(project, branches)
+            if not to_build:
+                update_imported_docs.delay(project.versions.get(slug='latest').pk)
+                msg = '(URL Build) Syncing versions for %s' % project.slug
+                pc_log.info(msg)
         if to_build:
             msg = '(URL Build) Build Started: %s [%s]' % (
                 url, ' '.join(to_build))
@@ -201,7 +209,7 @@ def _build_url(url, branches):
         if e.__class__ == NoProjectException:
             raise
         msg = "(URL Build) Failed: %s:%s" % (url, e)
-        pc_log.error(msg)
+        pc_log.error(msg, exc_info=True)
         return HttpResponse(msg)
 
 
@@ -211,7 +219,12 @@ def github_build(request):
     A post-commit hook for github.
     """
     if request.method == 'POST':
-        obj = json.loads(request.POST['payload'])
+        try:
+            # GitHub RTD integration
+            obj = json.loads(request.POST['payload'])
+        except:
+            # Generic post-commit hook
+            obj = json.loads(request.body)
         url = obj['repository']['url']
         ghetto_url = url.replace('http://', '').replace('https://', '')
         branch = obj['ref'].replace('refs/heads/', '')
@@ -219,28 +232,9 @@ def github_build(request):
         try:
             return _build_url(ghetto_url, [branch])
         except NoProjectException:
-            try:
-                name = obj['repository']['name']
-                desc = obj['repository']['description']
-                homepage = obj['repository']['homepage']
-                repo = obj['repository']['url']
-
-                email = obj['repository']['owner']['email']
-                user = User.objects.get(email=email)
-
-                proj = Project.objects.create(
-                    name=name,
-                    description=desc,
-                    project_url=homepage,
-                    repo=repo,
-                )
-                proj.users.add(user)
-                # Version doesn't exist yet, so use classic build method
-                update_docs.delay(pk=proj.pk)
-                pc_log.info("Created new project %s" % (proj))
-            except Exception, e:
-                pc_log.error("Error creating new project %s: %s" % (name, e))
-                return HttpResponseNotFound('Repo not found')
+            pc_log.error(
+                "(Incoming GitHub Build) Repo not found:  %s" % ghetto_url)
+            return HttpResponseNotFound('Repo not found: %s' % ghetto_url)
     else:
         return HttpResponse("You must POST to this resource.")
 
@@ -276,7 +270,12 @@ def generic_build(request, pk=None):
         project = Project.objects.get(pk=pk)
     # Allow slugs too
     except (Project.DoesNotExist, ValueError):
-        project = Project.objects.get(slug=pk)
+        try:
+            project = Project.objects.get(slug=pk)
+        except (Project.DoesNotExist, ValueError):
+            pc_log.error(
+                "(Incoming Generic Build) Repo not found:  %s" % pk)
+            return HttpResponseNotFound('Repo not found: %s' % pk)
     if request.method == 'POST':
         slug = request.POST.get('version_slug', None)
         if slug:
@@ -286,7 +285,7 @@ def generic_build(request, pk=None):
         else:
             pc_log.info(
                 "(Incoming Generic Build) %s [%s]" % (project.slug, 'latest'))
-            update_docs.delay(pk=pk, force=True)
+            trigger_build(project=project, force=True)
     else:
         return HttpResponse("You must POST to this resource.")
     return redirect('builds_project_list', project.slug)
@@ -381,7 +380,7 @@ def redirect_lang_slug(request, lang_slug, project_slug=None):
     """Redirect /en/ to /en/latest/."""
     kwargs = default_docs_kwargs(request, project_slug)
     kwargs['lang_slug'] = lang_slug
-    url = reverse(serve_docs, kwargs=kwargs)
+    url = reverse('docs_detail', kwargs=kwargs)
     return HttpResponseRedirect(url)
 
 
@@ -389,14 +388,14 @@ def redirect_version_slug(request, version_slug, project_slug=None):
     """Redirect /latest/ to /en/latest/."""
     kwargs = default_docs_kwargs(request, project_slug)
     kwargs['version_slug'] = version_slug
-    url = reverse(serve_docs, kwargs=kwargs)
+    url = reverse('docs_detail', kwargs=kwargs)
     return HttpResponseRedirect(url)
 
 
 def redirect_project_slug(request, project_slug=None):
     """Redirect / to /en/latest/."""
     kwargs = default_docs_kwargs(request, project_slug)
-    url = reverse(serve_docs, kwargs=kwargs)
+    url = reverse('docs_detail', kwargs=kwargs)
     return HttpResponseRedirect(url)
 
 
@@ -404,7 +403,7 @@ def redirect_page_with_filename(request, filename, project_slug=None):
     """Redirect /page/file.html to /en/latest/file.html."""
     kwargs = default_docs_kwargs(request, project_slug)
     kwargs['filename'] = filename
-    url = reverse(serve_docs, kwargs=kwargs)
+    url = reverse('docs_detail', kwargs=kwargs)
     return HttpResponseRedirect(url)
 
 
@@ -412,45 +411,62 @@ def serve_docs(request, lang_slug, version_slug, filename, project_slug=None):
     if not project_slug:
         project_slug = request.slug
     try:
-        proj = Project.objects.get(slug=project_slug)
-        ver = Version.objects.get(
-            project__slug=project_slug, slug=version_slug)
+        proj = Project.objects.protected(request.user).get(slug=project_slug)
+        ver = Version.objects.public(request.user).get(project__slug=project_slug, slug=version_slug)
     except (Project.DoesNotExist, Version.DoesNotExist):
         proj = None
         ver = None
     if not proj or not ver:
-        return server_helpful_404(request, project_slug, lang_slug, version_slug, filename)
+        return server_helpful_404(request, project_slug, lang_slug, version_slug,
+                                  filename)
 
-    # Auth checks
     if ver not in proj.versions.public(request.user, proj, only_active=False):
-        res = HttpResponse("You don't have access to this version.")
-        res.status_code = 401
-        return res
+        r = render_to_response('401.html',
+                               context_instance=RequestContext(request))
+        r.status_code = 401
+        return r
+    return _serve_docs(request, project=proj, version=ver, filename=filename,
+                       lang_slug=lang_slug, version_slug=version_slug,
+                       project_slug=project_slug)
 
+
+def _serve_docs(request, project, version, filename, lang_slug=None,
+                version_slug=None, project_slug=None):
+    '''Actually serve the built documentation files
+
+    This is not called directly, but is wrapped by :py:func:`serve_docs` so that
+    authentication can be manipulated.
+    '''
     # Figure out actual file to serve
     if not filename:
         filename = "index.html"
     # This is required because we're forming the filenames outselves instead of
     # letting the web server do it.
-    elif (proj.documentation_type == 'sphinx_htmldir'
-          and "_static" not in filename
-          and "_images" not in filename
-          and "html" not in filename
-          and not "inv" in filename):
+    elif (
+        (project.documentation_type == 'sphinx_htmldir' or project.documentation_type == 'mkdocs')
+            and "_static" not in filename
+            and ".css" not in filename
+            and ".js" not in filename
+            and ".png" not in filename
+            and ".jpg" not in filename
+            and "_images" not in filename
+            and ".html" not in filename
+            and "font" not in filename
+            and not "inv" in filename):
         filename += "index.html"
     else:
         filename = filename.rstrip('/')
     # Use the old paths if we're on our old location.
     # Otherwise use the new language symlinks.
     # This can be removed once we have 'en' symlinks for every project.
-    if lang_slug == proj.language:
-        basepath = proj.rtd_build_path(version_slug)
+    if lang_slug == project.language:
+        basepath = project.rtd_build_path(version_slug)
     else:
-        basepath = proj.translations_symlink_path(lang_slug)
+        basepath = project.translations_symlink_path(lang_slug)
         basepath = os.path.join(basepath, version_slug)
 
     # Serve file
-    log.info('Serving %s for %s' % (filename, proj))
+    log.info('Serving %s for %s' % (filename, project))
     if not settings.DEBUG and not getattr(settings, 'PYTHON_MEDIA', False):
         fullpath = os.path.join(basepath, filename)
         mimetype, encoding = mimetypes.guess_type(fullpath)
@@ -491,6 +507,7 @@ def server_error(request, template_name='500.html'):
     r.status_code = 500
     return r
 
+
 def _try_redirect(request, full_path=None):
     project = project_slug = None
     if hasattr(request, 'slug'):
@@ -521,6 +538,16 @@ def _try_redirect(request, full_path=None):
                     log.debug('Redirecting %s' % redirect)
                     to = redirect_filename(project=project, filename=redirect.to_url.lstrip('/'))
                     return HttpResponseRedirect(to)
+            elif redirect.redirect_type == 'exact':
+                if full_path == redirect.from_url:
+                    log.debug('Redirecting %s' % redirect)
+                    return HttpResponseRedirect(redirect.to_url)
+                # Handle full sub-level redirects
+                if '$rest' in redirect.from_url:
+                    match = redirect.from_url.split('$rest')[0]
+                    if full_path.startswith(match):
+                        cut_path = re.sub('^%s' % match, redirect.to_url, full_path)
+                        return HttpResponseRedirect(cut_path)
             elif redirect.redirect_type == 'sphinx_html':
                 if full_path.endswith('/'):
                     log.debug('Redirecting %s' % redirect)
@@ -532,6 +559,7 @@ def _try_redirect(request, full_path=None):
                     to = re.sub('.html$', '/', full_path)
                     return HttpResponseRedirect(to)
     return None
+
 
 def server_error_404(request, template_name='404.html'):
     """

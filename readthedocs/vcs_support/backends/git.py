@@ -1,3 +1,4 @@
+import re
 import logging
 import csv
 import os
@@ -16,6 +17,25 @@ class Backend(BaseVCS):
     contribution_backends = [GithubContributionBackend]
     fallback_branch = 'master'  # default branch
 
+
+    def __init__(self, *args, **kwargs):
+        super(Backend, self).__init__(*args, **kwargs)
+        self.token = kwargs.get('token', None)
+        self.repo_url = self._get_clone_url()
+
+    def _get_clone_url(self):
+        if '://' in self.repo_url:
+            hacked_url = self.repo_url.split('://')[1]
+            hacked_url = re.sub('.git$', '', hacked_url)
+            clone_url = 'https://%s' % hacked_url
+            if self.token:
+                clone_url = 'https://%s@%s' % (self.token, hacked_url)
+                return clone_url
+            # Don't edit URL because all hosts aren't the same
+            #else:
+                #clone_url = 'git://%s' % (hacked_url)
+        return self.repo_url
+
     def set_remote_url(self, url):
         return self.run('git', 'remote', 'set-url', 'origin', url)
 
@@ -31,8 +51,8 @@ class Backend(BaseVCS):
         code, out, err = self.run('git', 'fetch', '--prune')
         if code != 0:
             raise ProjectImportError(
-                "Failed to get code from '%s' (git fetch): %s" % (
-                    self.repo_url, code)
+                "Failed to get code from '%s' (git fetch): %s\n\nStderr:\n\n%s\n\n" % (
+                    self.repo_url, code, err)
             )
 
     def checkout_revision(self, revision=None):
@@ -131,7 +151,7 @@ class Backend(BaseVCS):
     @property
     def commit(self):
         retcode, stdout, err = self.run('git', 'rev-parse', 'HEAD')
-        return stdout
+        return stdout.strip()
 
     def checkout(self, identifier=None):
         self.check_working_dir()

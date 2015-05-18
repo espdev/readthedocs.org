@@ -8,4 +8,3 @@ Talks about Read the Docs
 * OSCON, July 2011
 * Djangocon, July 2011
 * OS Bridge, June 2014
-
