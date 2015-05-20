@@ -72,6 +72,8 @@ DEFAULT_FROM_EMAIL = "no-reply@docs-srv"
 # Lock builds for 10 minutes
 # REPO_LOCK_SECONDS = 300
 
+FILE_SYNCER = 'privacy.backends.syncers.LocalSyncer'
+
 try:
     from local_settings import *  # noqa
 except ImportError:
