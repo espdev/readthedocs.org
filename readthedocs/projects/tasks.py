@@ -311,16 +311,15 @@ def setup_environment(version):
         site_packages = '--system-site-packages'
     else:
         site_packages = '--no-site-packages'
-    # Here the command has been modified to support different
-    # interpreters.
+
     ret_dict['venv'] = run(
-        '{cmd} {site_packages} {path}'.format(
-            cmd='virtualenv-2.7 -p {interpreter}'.format(
-                interpreter=project.python_interpreter),
+        '{cmd} -m virtualenv {site_packages} {path}'.format(
+            cmd=project.python_interpreter,
             site_packages=site_packages,
-            path=project.venv_path(version=version.slug)
+            path=project.venv_path(version=version.slug),
         )
     )
+
     # Other code expects sphinx-build to be installed inside the
     # virtualenv.  Using the -I option makes sure it gets installed
     # even if it is already installed system-wide (and
