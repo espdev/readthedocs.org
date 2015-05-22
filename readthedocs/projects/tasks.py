@@ -331,8 +331,8 @@ def setup_environment(version):
         ignore_option = ''
 
     require_packages = ' '.join([
-        'pip==6.1.1',
-        'setuptools==15.2',
+        'pip==7.0.0',
+        'setuptools==16.0',
         'virtualenv==12.1.1',
         'sphinx==1.3.1',
         'docutils==0.12',
