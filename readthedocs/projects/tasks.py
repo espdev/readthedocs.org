@@ -333,7 +333,7 @@ def setup_environment(version):
     require_packages = ' '.join([
         'pip==7.0.0',
         'setuptools==16.0',
-        'virtualenv==12.1.1',
+        'virtualenv==13.0.0',
         'sphinx==1.3.1',
         'docutils==0.12',
         'mkdocs==0.12.2',
