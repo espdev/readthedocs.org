@@ -27,7 +27,7 @@
           {% comment %}Last build passed{% endcomment %}
           <h2>{% trans "Your documentation is ready to use" %}</h2>
 
-          <form method="get" action="{% url "docs_detail" project_slug=project.slug %}">
+          <form method="get" action="{{ project.get_docs_url }}">
             <p>
             {% blocktrans %}
               Your documentation has been built.
@@ -43,7 +43,7 @@
           {% comment %}Last build failed{% endcomment %}
           <h2>{% trans "Your documentation failed to build" %}</h2>
 
-          <form method="get" action="{% url "builds_detail" project_slug=project.slug pk=onboard.build.pk %}">
+          <form method="get" action="{% url "builds_detail" project_slug=project.slug build_pk=onboard.build.pk %}">
             <p>
             {% blocktrans %}
               There was a problem building your documentation,

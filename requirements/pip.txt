@@ -1,53 +1,41 @@
-# Hack around bzr hosting
-
---allow-external bzr
---allow-unverified bzr
---allow-external launchpadlib
---allow-unverified launchpadlib
---allow-external lazr.authentication
---allow-unverified lazr.authentication
-
-## Upgraded packages
-pip==7.0.0
-setuptools==16.0
-virtualenv==13.0.0
-docutils==0.12
-Sphinx==1.3.1
+# Base packages
+pip==8.0.2
+virtualenv==14.0.5
+docutils==0.11
+Sphinx==1.3.5
 Pygments==2.0.2
-mkdocs==0.12.2
+mkdocs==0.14.0
+readthedocs-build==2.0.5
+django==1.8.3
 
-django==1.6.11
-django-tastypie==0.11.1
+git+https://github.com/django-tastypie/django-tastypie.git@1e1aff3dd4dcd21669e9c68bd7681253b286b856#egg=django-tastypie
 django-haystack==2.1.0
 celery-haystack==0.7.2
-django-guardian==1.2.0
+django-guardian==1.3.0
 django-extensions==1.3.8
-South==1.0.2
 djangorestframework==3.0.4
-pytest-django==2.6.2
+django-vanilla-views==1.0.4
+pytest-django==2.8.0
 
 requests==2.3.0
 slumber==0.6.0
 lxml==3.3.5
 
 # Basic tools
-redis==2.7.1
-hiredis==0.1.2
-celery==3.0.24
-django-celery==3.0.23
-django-allauth==0.16.1
+redis==2.10.3
+celery==3.1.18
+django-celery==3.1.16
+git+https://github.com/pennersr/django-allauth.git@d869aff9#egg=django-allauth
+dnspython==1.11.0
 
 # VCS
-bzr==2.5b4
 mercurial==2.6.3
-github2==0.5.2
 httplib2==0.7.7
 
 # Search
-elasticsearch==0.4.3
+elasticsearch==1.5.0
 pyelasticsearch==0.7.1
 pyquery==1.2.2
-
 
 # Utils
 django-gravatar2==1.0.6
@@ -59,24 +47,28 @@ django-kombu==0.9.4
 django-secure==0.1.2
 mimeparse==0.1.3
 mock==1.0.1
-simplejson==2.3.0
 stripe==1.20.2
-factory-boy==2.4.1
+django-copyright==1.0.0
+django-formtools==1.0
+django-dynamic-fixture==1.8.5
+docker-py==1.3.1
+django-textclassifier==1.0
+django-annoying==0.8.4
 
 # Docs
-sphinx-http-domain==0.2
+sphinxcontrib-httpdomain==1.4.0
+commonmark==0.5.5
+recommonmark==0.1.1
 
 # Version comparison stuff
 Distutils2==1.0a3
-distlib==0.1.2
+packaging==15.2
 
 # Commenting stuff
 django-cors-headers==0.13
-nilsimsa==0.2.0
+nilsimsa==0.3.7
 
 # Pegged git requirements
 git+https://github.com/alex/django-filter.git#egg=django-filter
 git+https://github.com/ericflo/django-pagination.git@e5f669036c#egg=django_pagination-dev
 git+https://github.com/alex/django-taggit.git#egg=django_taggit-dev
-git+https://github.com/jMyles/bamboo_boy#egg=bamboo_boy
-

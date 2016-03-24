@@ -1,3 +1,5 @@
+import os
+
 from .base import *  # noqa
 
 
@@ -50,7 +52,6 @@ WEBSOCKET_HOST = 'websocket.readthedocs.org:8088'
 
 PRODUCTION_DOMAIN = 'readthedocs.org'
 USE_SUBDOMAIN = True
-NGINX_X_ACCEL_REDIRECT = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
@@ -67,7 +68,11 @@ SOCIALACCOUNT_PROVIDERS = {
     'github': {'SCOPE': ['user:email', 'read:org', 'admin:repo_hook', 'repo:status']}
 }
 
-try:
-    from local_settings import *  # noqa
-except ImportError:
-    pass
+# allauth settings
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
+if not os.environ.get('DJANGO_SETTINGS_SKIP_LOCAL', False):
+    try:
+        from local_settings import *  # noqa
+    except ImportError:
+        pass

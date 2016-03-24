@@ -3,12 +3,10 @@ documentation and header rendering, and server errors.
 
 """
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseNotFound
 from django.shortcuts import render_to_response, get_object_or_404, redirect
-from django.db.models import Max, F
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
@@ -16,25 +14,22 @@ from django.views.generic import TemplateView
 
 from haystack.query import EmptySearchQuerySet
 from haystack.query import SearchQuerySet
-from celery.task.control import inspect
-import stripe
 
-from builds.models import Build
-from builds.models import Version
-from core.forms import FacetedSearchForm
-from core.utils import trigger_build
-from donate.mixins import DonateProgressMixin
-from projects import constants
-from projects.models import Project, ImportedFile, ProjectRelationship
-from projects.tasks import remove_dir, update_imported_docs
-from redirects.models import Redirect
-from redirects.utils import redirect_filename
+from readthedocs.builds.models import Build
+from readthedocs.builds.models import Version
+from readthedocs.core.forms import FacetedSearchForm
+from readthedocs.core.utils import trigger_build, broadcast
+from readthedocs.donate.mixins import DonateProgressMixin
+from readthedocs.builds.constants import LATEST
+from readthedocs.projects import constants
+from readthedocs.projects.models import Project, ImportedFile, ProjectRelationship
+from readthedocs.projects.tasks import remove_dir, update_imported_docs
+from readthedocs.redirects.utils import get_redirect_response
 
 import json
 import mimetypes
 import os
 import logging
-import redis
 import re
 
 log = logging.getLogger(__name__)
@@ -53,64 +48,50 @@ class HomepageView(DonateProgressMixin, TemplateView):
         '''Add latest builds and featured projects'''
         context = super(HomepageView, self).get_context_data(**kwargs)
         latest = []
-        latest_builds = Build.objects.order_by('-date')[:100]
+        latest_builds = (
+            Build.objects
+            .filter(
+                project__privacy_level=constants.PUBLIC,
+                success=True,
+            )
+            .order_by('-date')
+        )[:100]
         for build in latest_builds:
-            if (build.project.privacy_level == constants.PUBLIC
-                    and build.project not in latest
-                    and len(latest) < 10):
+            if (build.project not in latest and len(latest) < 10):
                 latest.append(build.project)
         context['project_list'] = latest
         context['featured_list'] = Project.objects.filter(featured=True)
         return context
 
 
-def random_page(request, project=None):
-    imp_file = ImportedFile.objects.order_by('?')
-    if project:
-        return HttpResponseRedirect((imp_file.filter(project__slug=project)[0]
-                                             .get_absolute_url()))
-    return HttpResponseRedirect(imp_file[0].get_absolute_url())
+class SupportView(TemplateView):
+    template_name = 'support.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(SupportView, self).get_context_data(**kwargs)
+        support_email = getattr(settings, 'SUPPORT_EMAIL', None)
+        if not support_email:
+            support_email = 'support@{domain}'.format(
+                domain=getattr(settings, 'PRODUCTION_DOMAIN', 'readthedocs.org'))
+
+        context['support_email'] = support_email
+        return context
 
 
-def queue_depth(request):
-    r = redis.Redis(**settings.REDIS)
-    return HttpResponse(r.llen('celery'))
-
-
-def queue_info(request):
-    i = inspect()
-    active_pks = []
-    reserved_pks = []
-    resp = ""
-
-    active = i.active()
-    if active:
-        try:
-            for obj in active['build']:
-                kwargs = eval(obj['kwargs'])
-                active_pks.append(str(kwargs['pk']))
-            active_resp = "Active: %s  " % " ".join(active_pks)
-            resp += active_resp
-        except Exception, e:
-            resp += str(e)
-
-    reserved = i.reserved()
-    if reserved:
-        try:
-            for obj in reserved['build']:
-                kwrags = eval(obj['kwargs'])
-                reserved_pks.append(str(kwargs['pk']))
-            reserved_resp = " | Reserved: %s" % " ".join(reserved_pks)
-            resp += reserved_resp
-        except Exception, e:
-            resp += str(e)
-
-    return HttpResponse(resp)
+def random_page(request, project_slug=None):
+    imported_file = ImportedFile.objects.order_by('?')
+    if project_slug:
+        imported_file = imported_file.filter(project__slug=project_slug)
+    imported_file = imported_file.first()
+    if imported_file is None:
+        raise Http404
+    url = imported_file.get_absolute_url()
+    return HttpResponseRedirect(url)
 
 
 def live_builds(request):
     builds = Build.objects.filter(state='building')[:5]
-    WEBSOCKET_HOST = getattr(settings, 'WEBSOCKET_HOST', 'localhost:8088')
+    websocket_host = getattr(settings, 'WEBSOCKET_HOST', 'localhost:8088')
     count = builds.count()
     percent = 100
     if count > 1:
@@ -118,7 +99,7 @@ def live_builds(request):
     return render_to_response('all_builds.html',
                               {'builds': builds,
                                'build_percent': percent,
-                               'WEBSOCKET_HOST': WEBSOCKET_HOST},
+                               'websocket_host': websocket_host},
                               context_instance=RequestContext(request))
 
 
@@ -128,22 +109,36 @@ def wipe_version(request, project_slug, version_slug):
                                 slug=version_slug)
     if request.user not in version.project.users.all():
         raise Http404("You must own this project to wipe it.")
-    del_dirs = [version.project.checkout_path(
-        version.slug), version.project.venv_path(version.slug)]
-    for del_dir in del_dirs:
-        remove_dir.delay(del_dir)
-    return render_to_response('wipe_version.html',
-                              {'del_dir': del_dir},
-                              context_instance=RequestContext(request))
+
+    if request.method == 'POST':
+        del_dirs = [
+            os.path.join(version.project.doc_path, 'checkouts', version.slug),
+            os.path.join(version.project.doc_path, 'envs', version.slug),
+            os.path.join(version.project.doc_path, 'conda', version.slug),
+        ]
+        for del_dir in del_dirs:
+            broadcast(type='build', task=remove_dir, args=[del_dir])
+        return redirect('project_version_list', project_slug)
+    else:
+        return render_to_response('wipe_version.html',
+                                  context_instance=RequestContext(request))
 
 
 def _build_version(project, slug, already_built=()):
+    """
+    Where we actually trigger builds for a project and slug.
+
+    All webhook logic should route here to call ``trigger_build``.
+    """
     default = project.default_branch or (project.vcs_repo().fallback_branch)
+    if not project.has_valid_webhook:
+        project.has_valid_webhook = True
+        project.save()
     if slug == default and slug not in already_built:
         # short circuit versions that are default
         # these will build at "latest", and thus won't be
         # active
-        latest_version = project.versions.get(slug='latest')
+        latest_version = project.versions.get(slug=LATEST)
         trigger_build(project=project, version=latest_version, force=True)
         pc_log.info(("(Version build) Building %s:%s"
                      % (project.slug, latest_version.slug)))
@@ -153,7 +148,7 @@ def _build_version(project, slug, already_built=()):
             trigger_build(project=project, version=slug_version, force=True)
             pc_log.info(("(Version build) Building %s:%s"
                          % (project.slug, slug_version.slug)))
-        return "latest"
+        return LATEST
     elif project.versions.exclude(active=True).filter(slug=slug).exists():
         pc_log.info(("(Version build) Not Building %s" % slug))
         return None
@@ -169,6 +164,13 @@ def _build_version(project, slug, already_built=()):
 
 
 def _build_branches(project, branch_list):
+    """
+    Build the branches for a specific project.
+
+    Returns:
+        to_build - a list of branches that were built
+        not_building - a list of branches that we won't build
+    """
     for branch in branch_list:
         versions = project.versions_from_branch_name(branch)
         to_build = set()
@@ -185,19 +187,27 @@ def _build_branches(project, branch_list):
 
 
 def _build_url(url, branches):
+    """
+    Map a URL onto specific projects to build that are linked to that URL.
+
+    Check each of the ``branches`` to see if they are active and should be built.
+    """
     try:
-        projects = Project.objects.filter(repo__endswith=url) | Project.objects.filter(repo__endswith=url + '.git')
+        projects = (
+            Project.objects.filter(repo__iendswith=url) |
+            Project.objects.filter(repo__iendswith=url + '.git'))
         if not projects.count():
             raise NoProjectException()
         for project in projects:
-            (to_build, not_building) = _build_branches(project, branches)
-            if not to_build:
-                update_imported_docs.delay(project.versions.get(slug='latest').pk)
+            (built, not_building) = _build_branches(project, branches)
+            if not built:
+                # Call update_imported_docs to update tag/branch info
+                update_imported_docs.delay(project.versions.get(slug=LATEST).pk)
                 msg = '(URL Build) Syncing versions for %s' % project.slug
                 pc_log.info(msg)
-        if to_build:
+        if built:
             msg = '(URL Build) Build Started: %s [%s]' % (
-                url, ' '.join(to_build))
+                url, ' '.join(built))
             pc_log.info(msg)
             return HttpResponse(msg)
         else:
@@ -205,7 +215,7 @@ def _build_url(url, branches):
                 url, ' '.join(not_building))
             pc_log.info(msg)
             return HttpResponse(msg)
-    except Exception, e:
+    except Exception as e:
         if e.__class__ == NoProjectException:
             raise
         msg = "(URL Build) Failed: %s:%s" % (url, e)
@@ -228,12 +238,38 @@ def github_build(request):
         url = obj['repository']['url']
         ghetto_url = url.replace('http://', '').replace('https://', '')
         branch = obj['ref'].replace('refs/heads/', '')
-        pc_log.info("(Incoming Github Build) %s [%s]" % (ghetto_url, branch))
+        pc_log.info("(Incoming GitHub Build) %s [%s]" % (ghetto_url, branch))
         try:
             return _build_url(ghetto_url, [branch])
         except NoProjectException:
             pc_log.error(
                 "(Incoming GitHub Build) Repo not found:  %s" % ghetto_url)
+            return HttpResponseNotFound('Repo not found: %s' % ghetto_url)
+    else:
+        return HttpResponse("You must POST to this resource.")
+
+
+@csrf_exempt
+def gitlab_build(request):
+    """
+    A post-commit hook for GitLab.
+    """
+    if request.method == 'POST':
+        try:
+            # GitLab RTD integration
+            obj = json.loads(request.POST['payload'])
+        except:
+            # Generic post-commit hook
+            obj = json.loads(request.body)
+        url = obj['repository']['homepage']
+        ghetto_url = url.replace('http://', '').replace('https://', '')
+        branch = obj['ref'].replace('refs/heads/', '')
+        pc_log.info("(Incoming GitLab Build) %s [%s]" % (ghetto_url, branch))
+        try:
+            return _build_url(ghetto_url, [branch])
+        except NoProjectException:
+            pc_log.error(
+                "(Incoming GitLab Build) Repo not found:  %s" % ghetto_url)
             return HttpResponseNotFound('Repo not found: %s' % ghetto_url)
     else:
         return HttpResponse("You must POST to this resource.")
@@ -265,27 +301,24 @@ def bitbucket_build(request):
 
 
 @csrf_exempt
-def generic_build(request, pk=None):
+def generic_build(request, project_id_or_slug=None):
     try:
-        project = Project.objects.get(pk=pk)
+        project = Project.objects.get(pk=project_id_or_slug)
     # Allow slugs too
     except (Project.DoesNotExist, ValueError):
         try:
-            project = Project.objects.get(slug=pk)
+            project = Project.objects.get(slug=project_id_or_slug)
         except (Project.DoesNotExist, ValueError):
             pc_log.error(
-                "(Incoming Generic Build) Repo not found:  %s" % pk)
-            return HttpResponseNotFound('Repo not found: %s' % pk)
+                "(Incoming Generic Build) Repo not found:  %s" % (
+                    project_id_or_slug))
+            return HttpResponseNotFound(
+                'Repo not found: %s' % project_id_or_slug)
     if request.method == 'POST':
-        slug = request.POST.get('version_slug', None)
-        if slug:
-            pc_log.info(
-                "(Incoming Generic Build) %s [%s]" % (project.slug, slug))
-            _build_version(project, slug)
-        else:
-            pc_log.info(
-                "(Incoming Generic Build) %s [%s]" % (project.slug, 'latest'))
-            trigger_build(project=project, force=True)
+        slug = request.POST.get('version_slug', project.default_version)
+        pc_log.info(
+            "(Incoming Generic Build) %s [%s]" % (project.slug, slug))
+        _build_version(project, slug)
     else:
         return HttpResponse("You must POST to this resource.")
     return redirect('builds_project_list', project.slug)
@@ -412,7 +445,8 @@ def serve_docs(request, lang_slug, version_slug, filename, project_slug=None):
         project_slug = request.slug
     try:
         proj = Project.objects.protected(request.user).get(slug=project_slug)
-        ver = Version.objects.public(request.user).get(project__slug=project_slug, slug=version_slug)
+        ver = Version.objects.public(request.user).get(
+            project__slug=project_slug, slug=version_slug)
     except (Project.DoesNotExist, Version.DoesNotExist):
         proj = None
         ver = None
@@ -443,16 +477,18 @@ def _serve_docs(request, project, version, filename, lang_slug=None,
     # This is required because we're forming the filenames outselves instead of
     # letting the web server do it.
     elif (
-        (project.documentation_type == 'sphinx_htmldir' or project.documentation_type == 'mkdocs')
-            and "_static" not in filename
-            and ".css" not in filename
-            and ".js" not in filename
-            and ".png" not in filename
-            and ".jpg" not in filename
-            and "_images" not in filename
-            and ".html" not in filename
-            and "font" not in filename
-            and not "inv" in filename):
+            (project.documentation_type == 'sphinx_htmldir' or
+             project.documentation_type == 'mkdocs') and
+            "_static" not in filename and
+            ".css" not in filename and
+            ".js" not in filename and
+            ".png" not in filename and
+            ".jpg" not in filename and
+            ".svg" not in filename and
+            "_images" not in filename and
+            ".html" not in filename and
+            "font" not in filename and
+            "inv" not in filename):
         filename += "index.html"
     else:
         filename = filename.rstrip('/')
@@ -469,9 +505,9 @@ def _serve_docs(request, project, version, filename, lang_slug=None,
     log.info('Serving %s for %s' % (filename, project))
     if not settings.DEBUG and not getattr(settings, 'PYTHON_MEDIA', False):
         fullpath = os.path.join(basepath, filename)
-        mimetype, encoding = mimetypes.guess_type(fullpath)
-        mimetype = mimetype or 'application/octet-stream'
-        response = HttpResponse(mimetype=mimetype)
+        content_type, encoding = mimetypes.guess_type(fullpath)
+        content_type = content_type or 'application/octet-stream'
+        response = HttpResponse(content_type=content_type)
         if encoding:
             response["Content-Encoding"] = encoding
         try:
@@ -508,64 +544,11 @@ def server_error(request, template_name='500.html'):
     return r
 
 
-def _try_redirect(request, full_path=None):
-    project = project_slug = None
-    if hasattr(request, 'slug'):
-        project_slug = request.slug
-    elif full_path.startswith('/docs/'):
-        split = full_path.split('/')
-        if len(split) > 2:
-            project_slug = split[2]
-    else:
-        return None
-
-    if project_slug:
-        try:
-            project = Project.objects.get(slug=project_slug)
-        except Project.DoesNotExist:
-            return None
-
-    if project:
-        for redirect in project.redirects.all():
-            if redirect.redirect_type == 'prefix':
-                if full_path.startswith(redirect.from_url):
-                    log.debug('Redirecting %s' % redirect)
-                    cut_path = re.sub('^%s' % redirect.from_url, '', full_path)
-                    to = redirect_filename(project=project, filename=cut_path)
-                    return HttpResponseRedirect(to)
-            elif redirect.redirect_type == 'page':
-                if full_path == redirect.from_url:
-                    log.debug('Redirecting %s' % redirect)
-                    to = redirect_filename(project=project, filename=redirect.to_url.lstrip('/'))
-                    return HttpResponseRedirect(to)
-            elif redirect.redirect_type == 'exact':
-                if full_path == redirect.from_url:
-                    log.debug('Redirecting %s' % redirect)
-                    return HttpResponseRedirect(redirect.to_url)
-                # Handle full sub-level redirects
-                if '$rest' in redirect.from_url:
-                    match = redirect.from_url.split('$rest')[0]
-                    if full_path.startswith(match):
-                        cut_path = re.sub('^%s' % match, redirect.to_url, full_path)
-                        return HttpResponseRedirect(cut_path)
-            elif redirect.redirect_type == 'sphinx_html':
-                if full_path.endswith('/'):
-                    log.debug('Redirecting %s' % redirect)
-                    to = re.sub('/$', '.html', full_path)
-                    return HttpResponseRedirect(to)
-            elif redirect.redirect_type == 'sphinx_htmldir':
-                if full_path.endswith('.html'):
-                    log.debug('Redirecting %s' % redirect)
-                    to = re.sub('.html$', '/', full_path)
-                    return HttpResponseRedirect(to)
-    return None
-
-
 def server_error_404(request, template_name='404.html'):
     """
     A simple 404 handler so we get media
     """
-    response = _try_redirect(request, full_path=request.get_full_path())
+    response = get_redirect_response(request, path=request.get_full_path())
     if response:
         return response
     r = render_to_response(template_name,
@@ -574,8 +557,10 @@ def server_error_404(request, template_name='404.html'):
     return r
 
 
-def server_helpful_404(request, project_slug=None, lang_slug=None, version_slug=None, filename=None, template_name='404.html'):
-    response = _try_redirect(request, full_path=filename)
+def server_helpful_404(
+        request, project_slug=None, lang_slug=None, version_slug=None,
+        filename=None, template_name='404.html'):
+    response = get_redirect_response(request, path=filename)
     if response:
         return response
     pagename = re.sub(
@@ -636,8 +621,10 @@ def get_suggestion(project_slug, lang_slug, version_slug, pagename, user):
                 else:
                     # Case #7: Show available translations of the version
                     suggestion['type'] = 'list'
-                    suggestion[
-                        'message'] = "Requested page seems not to be translated in requested language. But it's available in these languages."
+                    suggestion['message'] = (
+                        "Requested page seems not to be translated in "
+                        "requested language. But it's available in these "
+                        "languages.")
                     suggestion['list'] = []
                     suggestion['list'].append({
                         'label': proj.language,
@@ -666,8 +653,9 @@ def get_suggestion(project_slug, lang_slug, version_slug, pagename, user):
                 if trans:  # requested language is available
                     # Case #6: Show available versions of the translation
                     suggestion['type'] = 'list'
-                    suggestion[
-                        'message'] = "Requested version seems not to have been built yet. But these versions are available."
+                    suggestion['message'] = (
+                        "Requested version seems not to have been built yet. "
+                        "But these versions are available.")
                     suggestion['list'] = []
                     for v in Version.objects.public(user, trans, True):
                         suggestion['list'].append({
@@ -712,7 +700,7 @@ def morelikethis(request, project_slug, filename):
     else:
         json_response = {"message": "Not Found"}
     jsonp = "%s(%s)" % (request.GET.get('callback'), json_response)
-    return HttpResponse(jsonp, mimetype='text/javascript')
+    return HttpResponse(jsonp, content_type='text/javascript')
 
 
 class SearchView(TemplateView):

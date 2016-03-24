@@ -15,17 +15,18 @@ from rest_framework.decorators import (
 )
 from rest_framework.exceptions import ParseError
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import JSONRenderer, JSONPRenderer, BrowsableAPIRenderer
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework.viewsets import ModelViewSet
 from sphinx.websupport import WebSupport
 
-from comments.models import DocumentComment, DocumentNode, NodeSnapshot, DocumentCommentSerializer,\
-    DocumentNodeSerializer, ModerationActionSerializer
-from privacy.backend import AdminNotAuthorized
-from projects.models import Project
-from restapi.permissions import IsOwner, CommentModeratorOrReadOnly
+from readthedocs.comments.models import (
+    DocumentComment, DocumentNode, NodeSnapshot, DocumentCommentSerializer,
+    DocumentNodeSerializer, ModerationActionSerializer)
+from readthedocs.privacy.backend import AdminNotAuthorized
+from readthedocs.projects.models import Project
+from readthedocs.restapi.permissions import IsOwner, CommentModeratorOrReadOnly
 
 from .backend import DjangoStorage
 from .session import UnsafeSessionAuthentication
@@ -46,7 +47,7 @@ support = WebSupport(
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticatedOrReadOnly])
-@renderer_classes((JSONRenderer, JSONPRenderer, BrowsableAPIRenderer))
+@renderer_classes((JSONRenderer,))
 def get_options(request):
     base_opts = support.base_comment_opts
     base_opts['addCommentURL'] = '/api/v2/comments/'
@@ -56,7 +57,7 @@ def get_options(request):
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticatedOrReadOnly])
-@renderer_classes((JSONRenderer, JSONPRenderer, BrowsableAPIRenderer))
+@renderer_classes((JSONRenderer,))
 def get_metadata(request):
     """
     Check for get_metadata
@@ -69,7 +70,7 @@ def get_metadata(request):
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.AllowAny])
 @authentication_classes([UnsafeSessionAuthentication])
-@renderer_classes((JSONRenderer, JSONPRenderer))
+@renderer_classes((JSONRenderer,))
 def attach_comment(request):
     comment_id = request.POST.get('comment', '')
     comment = DocumentComment.objects.get(pk=comment_id)
@@ -79,7 +80,6 @@ def attach_comment(request):
     comment.node = snapshot.node
 
     serialized_comment = DocumentCommentSerializer(comment)
-    serialized_comment.data
     return Response(serialized_comment.data)
 
 
@@ -144,7 +144,9 @@ def update_node(request):
         version = post_data['version']
         page = post_data['page']
 
-        node = DocumentNode.objects.from_hash(node_hash=old_hash, project_slug=project, version_slug=version, page=page)
+        node = DocumentNode.objects.from_hash(
+            node_hash=old_hash, project_slug=project, version_slug=version,
+            page=page)
 
         node.update_hash(new_hash, commit)
         return Response(DocumentNodeSerializer(node).data)
@@ -168,7 +170,9 @@ class CommentViewSet(ModelViewSet):
                 queryset = DocumentComment.objects.filter(node=node)
 
             except KeyError:
-                raise ParseError('To get comments by node, you must also provide page, version, and project.')
+                raise ParseError(
+                    'To get comments by node, you must also provide page, '
+                    'version, and project.')
             except DocumentNode.DoesNotExist:
                 queryset = DocumentComment.objects.none()
         elif qp.get('project'):
@@ -183,7 +187,7 @@ class CommentViewSet(ModelViewSet):
         project = Project.objects.get(slug=request.data['project'])
         comment = project.add_comment(version_slug=request.data['version'],
                                       page=request.data['document_page'],
-                                      hash=request.data['node'],
+                                      content_hash=request.data['node'],
                                       commit=request.data['commit'],
                                       user=request.user,
                                       text=request.data['text'])

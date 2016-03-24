@@ -1,5 +1,5 @@
 from rest_framework import decorators, permissions, status
-from rest_framework.renderers import JSONPRenderer, JSONRenderer, BrowsableAPIRenderer
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 import json
@@ -9,15 +9,16 @@ from django.conf import settings
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 
-from core.utils import clean_url, cname_to_slug
-from builds.models import Version
-from projects.models import Project
-from core.templatetags.core_tags import make_document_url
+from readthedocs.core.utils import clean_url, cname_to_slug
+from readthedocs.builds.constants import LATEST
+from readthedocs.builds.models import Version
+from readthedocs.projects.models import Project
+from readthedocs.core.templatetags.core_tags import make_document_url
 
 
 @decorators.api_view(['GET'])
 @decorators.permission_classes((permissions.AllowAny,))
-@decorators.renderer_classes((JSONRenderer, JSONPRenderer, BrowsableAPIRenderer))
+@decorators.renderer_classes((JSONRenderer,))
 def cname(request):
     """
     Get the slug that a particular hostname resolves to.
@@ -43,7 +44,7 @@ def cname(request):
 
 @decorators.api_view(['GET'])
 @decorators.permission_classes((permissions.AllowAny,))
-@decorators.renderer_classes((JSONRenderer, JSONPRenderer, BrowsableAPIRenderer))
+@decorators.renderer_classes((JSONRenderer,))
 def docurl(request):
     """
     Get the url that a slug resolves to.
@@ -54,11 +55,15 @@ def docurl(request):
 
     """
     project = request.GET.get('project')
-    version = request.GET.get('version', 'latest')
+    version = request.GET.get('version', LATEST)
     doc = request.GET.get('doc', 'index')
+    if project is None:
+        return Response({'error': 'Need project and doc'}, status=status.HTTP_400_BAD_REQUEST)
 
     project = get_object_or_404(Project, slug=project)
-    version = get_object_or_404(Version.objects.public(request.user, project=project, only_active=False), slug=version)
+    version = get_object_or_404(
+        Version.objects.public(request.user, project=project, only_active=False),
+        slug=version)
     return Response({
         'url': make_document_url(project=project, version=version.slug, page=doc)
     })
@@ -66,7 +71,7 @@ def docurl(request):
 
 @decorators.api_view(['GET'])
 @decorators.permission_classes((permissions.AllowAny,))
-@decorators.renderer_classes((JSONRenderer, JSONPRenderer, BrowsableAPIRenderer))
+@decorators.renderer_classes((JSONRenderer,))
 def embed(request):
     """
     Embed a section of content from any Read the Docs page.
@@ -87,9 +92,12 @@ def embed(request):
     # Current Request
     """
     project = request.GET.get('project')
-    version = request.GET.get('version', 'latest')
+    version = request.GET.get('version', LATEST)
     doc = request.GET.get('doc')
     section = request.GET.get('section')
+
+    if project is None or doc is None:
+        return Response({'error': 'Need project and doc'}, status=status.HTTP_400_BAD_REQUEST)
 
     embed_cache = cache.get('embed:%s' % project)
     if embed_cache:

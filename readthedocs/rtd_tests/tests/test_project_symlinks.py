@@ -1,12 +1,15 @@
+# -*- coding: utf-8 -*-
+
 import os
 from functools import wraps
 
 from mock import patch
 from django.test import TestCase
+from django_dynamic_fixture import get
 
-from builds.models import Version
-from projects.models import Project
-from projects.symlinks import symlink_translations
+from readthedocs.builds.models import Version
+from readthedocs.projects.models import Project, Domain
+from readthedocs.core.symlink import Symlink
 
 
 def patched(fn):
@@ -18,33 +21,104 @@ def patched(fn):
         def _collect_commands(cmd):
             self.commands.append(cmd)
 
-        with patch('projects.symlinks.run_on_app_servers', _collect_commands):
-            with patch('readthedocs.projects.symlinks.run_on_app_servers', _collect_commands):
-                return fn(self)
+        with patch('readthedocs.core.symlink.run', _collect_commands):
+            return fn(self)
     return wrapper
+
+
+class TestSubprojects(TestCase):
+
+    def setUp(self):
+        self.project = get(Project, slug='kong')
+        self.subproject = get(Project, slug='sub')
+        self.symlink = Symlink(self.project)
+        self.args = {
+            'web_root': self.symlink.WEB_ROOT,
+            'subproject_root': self.symlink.subproject_root,
+        }
+        self.commands = []
+
+    @patched
+    def test_subproject_normal(self):
+        self.project.add_subproject(self.subproject)
+        self.symlink.symlink_subprojects()
+        self.args['subproject'] = self.subproject.slug
+        commands = [
+            'ln -nsf {web_root}/{subproject} {subproject_root}/{subproject}',
+        ]
+
+        for index, command in enumerate(commands):
+            self.assertEqual(self.commands[index], command.format(**self.args))
+
+    @patched
+    def test_subproject_alias(self):
+        self.project.add_subproject(self.subproject, alias='sweet-alias')
+        self.symlink.symlink_subprojects()
+        self.args['subproject'] = self.subproject.slug
+        self.args['alias'] = 'sweet-alias'
+        commands = [
+            'ln -nsf {web_root}/{subproject} {subproject_root}/{subproject}',
+            'ln -nsf {web_root}/{subproject} {subproject_root}/{alias}',
+        ]
+
+        for index, command in enumerate(commands):
+            self.assertEqual(self.commands[index], command.format(**self.args))
+
+    def test_remove_subprojects(self):
+        self.project.add_subproject(self.subproject)
+        self.symlink.symlink_subprojects()
+        subproject_link = os.path.join(
+            self.symlink.subproject_root, self.subproject.slug
+        )
+        self.assertTrue(os.path.lexists(subproject_link))
+        self.project.remove_subproject(self.subproject)
+        self.symlink.symlink_subprojects()
+        self.assertTrue(not os.path.lexists(subproject_link))
+
+
+class TestSymlinkCnames(TestCase):
+
+    def setUp(self):
+        self.project = get(Project, slug='kong')
+        self.version = get(Version, verbose_name='latest', active=True, project=self.project)
+        self.symlink = Symlink(self.project)
+        self.args = {
+            'cname_root': self.symlink.CNAME_ROOT,
+            'project_root': self.symlink.project_root,
+        }
+        self.commands = []
+
+    @patched
+    def test_symlink_cname(self):
+        self.cname = get(Domain, project=self.project, url='http://woot.com', cname=True)
+        self.symlink.symlink_cnames()
+        self.args['cname'] = self.cname.domain
+        commands = [
+            'ln -nsf {project_root} {cname_root}/{cname}',
+        ]
+
+        for index, command in enumerate(commands):
+            self.assertEqual(self.commands[index], command.format(**self.args))
 
 
 class TestSymlinkTranslations(TestCase):
 
-    fixtures = ['eric', 'test_data']
     commands = []
 
     def setUp(self):
-        self.project = Project.objects.get(slug='kong')
-        self.translation = Project.objects.get(slug='pip')
+        self.project = get(Project, slug='kong')
+        self.translation = get(Project, slug='pip')
         self.translation.language = 'de'
         self.translation.main_lanuage_project = self.project
         self.project.translations.add(self.translation)
         self.translation.save()
         self.project.save()
-        Version.objects.create(verbose_name='master', slug='master',
-                               active=True, project=self.project)
-        Version.objects.create(verbose_name='master', slug='master',
-                               active=True, project=self.translation)
+        self.symlink = Symlink(self.project)
+        get(Version, verbose_name='master', active=True, project=self.project)
+        get(Version, verbose_name='master', active=True, project=self.translation)
         self.args = {
-            'project': self.project.doc_path,
-            'translation': self.translation.doc_path,
-            'builds': os.path.join(self.project.doc_path, 'rtd-builds'),
+            'project_root': self.symlink.project_root,
+            'translation_root': os.path.join(self.symlink.WEB_ROOT, self.translation.slug),
         }
         self.assertIn(self.translation, self.project.translations.all())
         self.commands = []
@@ -52,16 +126,16 @@ class TestSymlinkTranslations(TestCase):
     @patched
     def test_symlink_basic(self):
         '''Test basic scenario, language english, translation german'''
-        symlink_translations(self.project.versions.first())
+        self.symlink.symlink_translations()
         commands = [
-            'mkdir -p {project}/translations',
-            'ln -nsf {translation}/rtd-builds {project}/translations/de',
-            'ln -nsf {builds} {project}/translations/en',
+            'ln -nsf {translation_root}/de {project_root}/de',
         ]
-        for (i, command) in enumerate(commands):
-            self.assertEqual(self.commands[i], command.format(**self.args),
-                             msg=('Command {0} mismatch, expecting {1}'
-                                  .format(i, self.commands[i])))
+
+        for command in commands:
+            self.assertIsNotNone(
+                self.commands.pop(
+                    self.commands.index(command.format(**self.args))
+                ))
 
     @patched
     def test_symlink_non_english(self):
@@ -74,16 +148,16 @@ class TestSymlinkTranslations(TestCase):
         self.translation.save()
         self.commands = []
 
-        symlink_translations(self.project.versions.first())
+        self.symlink.symlink_translations()
         commands = [
-            'mkdir -p {project}/translations',
-            'ln -nsf {project}/rtd-builds {project}/translations/de',
-            'ln -nsf {translation}/rtd-builds {project}/translations/en',
+            'ln -nsf {translation_root}/en {project_root}/en',
         ]
-        for (i, command) in enumerate(commands):
-            self.assertEqual(self.commands[i], command.format(**self.args),
-                             msg=('Command {0} mismatch, expecting {1}'
-                                  .format(i, self.commands[i])))
+
+        for command in commands:
+            self.assertIsNotNone(
+                self.commands.pop(
+                    self.commands.index(command.format(**self.args))
+                ))
 
     @patched
     def test_symlink_no_english(self):
@@ -95,19 +169,120 @@ class TestSymlinkTranslations(TestCase):
         # Change the languages, and then clear commands, as project.save calls
         # the symlinking
         self.project.language = 'de'
-        version = self.project.translations.first()
-        self.project.translations.remove(version)
+        trans = self.project.translations.first()
+        self.project.translations.remove(trans)
         self.project.save()
-        self.assertNotIn(version, self.project.translations.all())
+        self.assertNotIn(trans, self.project.translations.all())
         self.commands = []
 
-        symlink_translations(self.project.versions.first())
+        self.symlink.symlink_translations()
+        commands = []
+
+        for command in commands:
+            self.assertIsNotNone(
+                self.commands.pop(
+                    self.commands.index(command.format(**self.args))
+                ))
+
+
+    def test_remove_language(self):
+        self.symlink.symlink_translations()
+        trans_link = os.path.join(
+            self.symlink.project_root, self.translation.language
+        )
+        self.assertTrue(os.path.lexists(trans_link))
+        
+        trans = self.project.translations.first()
+        self.project.translations.remove(trans)
+        self.symlink.symlink_translations()
+        self.assertTrue(not os.path.lexists(trans_link))
+
+class TestSymlinkSingleVersion(TestCase):
+
+    def setUp(self):
+        self.project = get(Project, slug='kong')
+        self.version = get(Version, verbose_name='latest', active=True, project=self.project)
+        self.symlink = Symlink(self.project)
+        self.args = {
+            'project_root': self.symlink.project_root,
+            'doc_path': self.project.rtd_build_path(),
+        }
+        self.commands = []
+
+    @patched
+    def test_symlink_single_version(self):
+        self.symlink.symlink_single_version()
         commands = [
-            'mkdir -p {project}/translations',
-            'ln -nsf {project}/rtd-builds {project}/translations/de',
-            'ln -nsf {project}/rtd-builds {project}/translations/en',
+            'ln -nsf {doc_path}/ {project_root}',
         ]
-        for (i, command) in enumerate(commands):
-            self.assertEqual(self.commands[i], command.format(**self.args),
-                             msg=('Command {0} mismatch, expecting {1}'
-                                  .format(i, self.commands[i])))
+
+        for index, command in enumerate(commands):
+            self.assertEqual(self.commands[index], command.format(**self.args))
+
+
+class TestSymlinkVersions(TestCase):
+
+    def setUp(self):
+        self.project = get(Project, slug='kong')
+        self.stable = get(Version, slug='stable', verbose_name='stable', active=True, project=self.project)
+        self.symlink = Symlink(self.project)
+        self.args = {
+            'project_root': self.symlink.project_root,
+            'latest_path': self.project.rtd_build_path('latest'),
+            'stable_path': self.project.rtd_build_path('stable'),
+        }
+        self.commands = []
+
+    @patched
+    def test_symlink_versions(self):
+        self.symlink.symlink_versions()
+        commands = [
+            'ln -nsf {stable_path} {project_root}/en/stable',
+            'ln -nsf {latest_path} {project_root}/en/latest',
+        ]
+
+        for index, command in enumerate(commands):
+            self.assertEqual(self.commands[index], command.format(**self.args))
+
+    @patched
+    def test_no_symlink_private_versions(self):
+        self.stable.privacy_level = 'private'
+        self.stable.save()
+        self.symlink.symlink_versions()
+        commands = [
+            'ln -nsf {latest_path} {project_root}/en/latest',
+        ]
+
+        for index, command in enumerate(commands):
+            self.assertEqual(self.commands[index], command.format(**self.args))
+
+    def test_removed_versions(self):
+        version_link = os.path.join(
+            self.symlink.project_root, 'en', self.stable.slug
+        )
+        self.symlink.symlink_versions()
+        self.assertTrue(os.path.lexists(version_link))
+        self.stable.privacy_level = 'private'
+        self.stable.save()
+        self.symlink.symlink_versions()
+        self.assertTrue(not os.path.lexists(version_link))
+
+
+class TestSymlinkUnicode(TestCase):
+
+    def setUp(self):
+        self.project = get(Project, slug='kong', name=u'foo-∫')
+        self.stable = get(Version, slug='stable', verbose_name=u'foo-∂', active=True, project=self.project)
+        self.symlink = Symlink(self.project)
+        self.args = {
+            'project_root': self.symlink.project_root,
+            'latest_path': self.project.rtd_build_path('latest'),
+            'stable_path': self.project.rtd_build_path('stable'),
+        }
+        self.commands = []
+
+    @patched
+    def test_symlink_no_error(self):
+        # Don't raise an error.
+        self.symlink.run()
+        self.assertTrue(True)

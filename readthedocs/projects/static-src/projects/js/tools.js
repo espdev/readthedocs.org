@@ -1,13 +1,9 @@
+
 var rtd = require('readthedocs-client'),
     ko = require('knockout'),
-    $ = null;
+    jquery = require('jquery'),
+    $ = jquery;
 
-if (typeof(window) == 'undefined') {
-    require('jquery');
-}
-else {
-    $ = window.$;
-}
 
 function EmbedView (config) {
     var self = this;
@@ -176,8 +172,4 @@ function _show_modal (section) {
             embed_container.remove();
         }
     });
-}
-
-if (typeof(window) != 'undefined') {
-    window.tools = module.exports;
 }

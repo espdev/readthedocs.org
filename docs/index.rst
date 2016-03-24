@@ -2,7 +2,7 @@ Welcome to Read The Docs
 ========================
 
 `Read the Docs`_ hosts documentation for the open source community.
-We support Sphinx_ docs written with reStructuredText_ and Markdown_ docs written with Mkdocs_.
+We support Sphinx_ docs written with reStructuredText_ and `CommonMark`_.
 We pull your code from your Subversion_, Bazaar_, Git_, and Mercurial_ repositories.
 Then we build documentation and host it for you.
 Think of it as *Continuous Documentation*.
@@ -12,8 +12,8 @@ The code is open source, and `available on github`_.
 .. _Read the docs: http://readthedocs.org/
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _reStructuredText: http://sphinx.pocoo.org/rest.html
+.. _CommonMark: http://commonmark.org/
 .. _Markdown: http://daringfireball.net/projects/markdown/syntax
-.. _Mkdocs: http://www.mkdocs.org/
 .. _Subversion: http://subversion.tigris.org/
 .. _Bazaar: http://bazaar.canonical.com/
 .. _Git: http://git-scm.com/
@@ -44,6 +44,7 @@ Information about development is also available:
    features
    support
    faq
+   yaml-config
 
 
 .. _feature-docs:
@@ -58,6 +59,7 @@ Information about development is also available:
    alternate_domains
    localization
    vcs
+   conda
    canonical
    single_version
    privacy
@@ -73,13 +75,16 @@ Information about development is also available:
    :caption: Developer Documentation
 
    install
+   changelog
    contribute
    tests
    architecture
+   development/standards
+   development/buildenvironments
    symlinks
    settings
    i18n
-   api
+   issue-labels
 
 .. _business-docs:
 
@@ -89,6 +94,13 @@ Information about development is also available:
 
    business/index
 
+.. _custom-docs:
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Custom Install Documentation
+
+   custom_installs/index
 
 .. _design-docs:
 

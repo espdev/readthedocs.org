@@ -6,7 +6,7 @@ Read the Docs supports a number of custom domains for your convenience. Shorter 
 Subdomain Support
 ------------------
 
-Every project has a subdomain that is available to serve it's documentation. If you go to <slug>.readthedocs.org, it should show you the latest version of documentation. A good example is http://pip.readthedocs.org
+Every project has a subdomain that is available to serve its documentation. If you go to <slug>.readthedocs.org, it should show you the latest version of documentation. A good example is http://pip.readthedocs.org
 
 .. note:: If you have an old project that has an underscore (_) in the name, it will use a subdomain with a hypen (-).
           `RFC 1035 <http://tools.ietf.org/html/rfc1035>`_ has more information on valid subdomains.
@@ -14,14 +14,24 @@ Every project has a subdomain that is available to serve it's documentation. If 
 CNAME Support
 -------------
 
-If you have your own domain, you can still host with us. If you point a CNAME record in your DNS to the subdomain for your project, it should magically serve your latest documentation on the custom domain. Using pip as another example, http://www.pip-installer.org resolves, but is hosted on our infrastructure.
+If you have your own domain, you can still host with us. 
+This requires two steps:
+
+* Add a CNAME record in your DNS that point to our servers `readthedocs.org`
+* Add a Domain object in the **Project Admin > Domains** page for your project.
+
+Using pip as an example, http://www.pip-installer.org resolves, but is hosted on our infrastructure.
 
 As an example, fabric's dig record looks like this::
 
     -> dig docs.fabfile.org
     ...
     ;; ANSWER SECTION:
-    docs.fabfile.org.   7200    IN  CNAME   fabric-docs.readthedocs.org.
+    docs.fabfile.org.   7200    IN  CNAME   readthedocs.org.
+
+.. note:: We used to map your projects documentation from the subdomain that you pointed your CNAME to.
+          This wasn't workable at scale,
+          and now we require you to set the domain you want to resolve on your project.
 
 CNAME SSL
 ---------

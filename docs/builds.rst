@@ -6,6 +6,15 @@ Files: `tasks.py`_ - `doc_builder/`_
 .. _tasks.py: https://github.com/rtfd/readthedocs.org/blob/master/readthedocs/projects/tasks.py
 .. _doc_builder/: https://github.com/rtfd/readthedocs.org/tree/master/readthedocs/doc_builder
 
+Every documentation build has limited resources.
+Our current build limits are:
+
+* 15 minutes
+* 1GB of memory
+
+We can increase build limits on a per-project basis,
+if you provide a good reason your documentation needs more resources.
+
 How we build documentation
 --------------------------
 
@@ -21,7 +30,7 @@ we will first look for a ``conf.py`` file in your repository.
 If we don't find one,
 we will generate one for you.
 We will look inside a ``doc`` or ``docs`` directory first,
-and then default to the top-level of your documentation.
+and then look within your entire project.
 
 Then Sphinx will build any files with an ``.rst`` extension.
 If you have a ``README.rst``,
@@ -40,6 +49,8 @@ and then default to the top-level of your documentation.
 Then Mkdocs will build any files with an ``.md`` extension.
 If you have a ``README.md``,
 it will be transformed into an ``index.md`` automatically.
+As MkDocs doesn't support automatic PDF generation,
+Read the Docs cannot create a PDF version of your documentation with the *Mkdocs* option.
 
 Understanding what's going on
 -----------------------------
@@ -50,7 +61,7 @@ The first step of the process is that we check out your code from the repository
 
 Then we build the proper backend code for the type of documentation you've selected.
 
-If you have the *Use Virtualenv* option enabled, we will run ``setup.py install`` on your package, installing it into a virtual environment. You can also define additional packages to install with the *Requirements File* option.
+If you have the *Install Project* option enabled, we will run ``setup.py install`` on your package, installing it into a virtual environment. You can also define additional packages to install with the *Requirements File* option.
 
 When we build your documentation, we run `sphinx-build -b html . _build/html`, where `html` would be replaced with the correct backend. We also create man pages and pdf's automatically based on your project.
 
@@ -84,6 +95,7 @@ Packages installed in the build environment
 
 The build server does have a select number of C libraries installed, because they are used across a wide array of python projects. We can't install every C library out there, but we try and support the major ones. We currently have the following libraries installed:
 
+    * doxygen
     * LaTeX (texlive-full)
     * libevent (libevent-dev)
     * dvipng
@@ -111,5 +123,5 @@ The :doc:`api/doc_builder` API explains the higher level parts of the API that y
 Deleting a stale or broken build environment
 --------------------------------------------
 
-RTD doesn't expose this in the UI, but it is possible to remove the build directory of your project. If you want to remove a build environment for your project, hit http://readthedocs.org/wipe/<project_slug>/<version_slug>/. You must be logged in to do this.
+If you're having trouble getting your version to build, try wiping out the existing build/environment files.  On your version list page ``/projects/[project]/versions`` there is a "Wipe" button that will remove all of the files associated with your documentation build, but not the documentation itself.
 

@@ -26,6 +26,11 @@ the Docs site`_.
 
 .. _the Read the Docs site: https://docs.readthedocs.org/
 
+Contributing
+------------
+
+You can find information about contributing to Read the Docs at our `Contribution page <http://docs.readthedocs.org/en/latest/contribute.html#contributing-to-development>`_
+
 Quickstart for GitHub-Hosted Projects
 -------------------------------------
 
@@ -60,4 +65,4 @@ when you push to GitHub.
 .. |docs| image:: https://readthedocs.org/projects/docs/badge/?version=latest
     :alt: Documentation Status
     :scale: 100%
-    :target: https://readthedocs.org/projects/docs/
+    :target: https://docs.readthedocs.org/en/latest/?badge=latest
